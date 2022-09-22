@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+    <data-source source="LOCAL" name="web-comments@localhost" uuid="34aa500c-2c0d-4bf1-93dd-464d0cd2a8ef">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/web-comments</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="web-users@localhost" uuid="59e5e6ff-5ab3-47d8-865f-d0a9417df76b">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/web-users</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="web-tasks@localhost" uuid="074de70f-c7bc-4dcf-b856-09061d95628c">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/web-tasks</jdbc-url>
+    </data-source>
+  </component>
+</project>
