@@ -14,8 +14,11 @@ public class UserRegisterForm {
     @NotNull
     private String surname;
 
+//    @NotNull
+//    private UserId username;
+
     @NotNull
-    private UserId username;
+    private String username;
 
     @NotNull
     private String password;

@@ -10,6 +10,7 @@ import mk.ukim.finki.emt.taskmanagement.domain.valueobjects.UserId;
 import mk.ukim.finki.emt.taskmanagement.service.TaskService;
 import mk.ukim.finki.emt.taskmanagement.service.form.TaskCreateForm;
 import mk.ukim.finki.emt.taskmanagement.service.form.TaskEditForm;
+import mk.ukim.finki.emt.taskmanagement.xport.client.UserClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 public class TasksResource {
 
     private final TaskService taskService;
+    private final UserClient userClient;
 
     @GetMapping(value = {"/api", "/api/tasks"})
     public List<EachTaskDto> getAllTasks(){
@@ -31,9 +33,9 @@ public class TasksResource {
     }
 
     @GetMapping("/api/tasks/edit-task/{id}")
-    public ResponseEntity<Task> getEditTaskPage2(@PathVariable Long id){
+    public ResponseEntity<Task> getEditTaskPage2(@PathVariable String id){
 
-        TaskId taskId = TaskId.convertFromLong(id);
+        TaskId taskId = new TaskId(id);
 
         Optional<Task> task = this.taskService.findById(taskId);
 
@@ -52,8 +54,11 @@ public class TasksResource {
         String startDate = taskDto.getStartDate();
         String dueDate = taskDto.getDueDate();
         Integer days = Integer.valueOf(taskDto.getEstimationDays());
-        UserId creator = taskDto.getCreator();
-        UserId assignee = taskDto.getAssignee();
+        User creator = this.userClient.findByUsername(taskDto.getCreator());
+        User assignee = this.userClient.findByUsername(taskDto.getAssignee());
+
+        UserId creatorId = creator.getId();
+        UserId assigneeId = assignee.getId();
 
         TaskCreateForm taskCreateForm = new TaskCreateForm();
 
@@ -62,8 +67,8 @@ public class TasksResource {
         taskCreateForm.setStartDate(startDate);
         taskCreateForm.setDueDate(dueDate);
         taskCreateForm.setEstimationDays(days);
-        taskCreateForm.setCreator(creator);
-        taskCreateForm.setAssignee(assignee);
+        taskCreateForm.setCreator(creatorId);
+        taskCreateForm.setAssignee(assigneeId);
 
         return this.taskService.create(taskCreateForm)
                 .map(task -> ResponseEntity.ok().body(task))
@@ -71,15 +76,16 @@ public class TasksResource {
     }
 
     @PutMapping("/api/tasks/add/{id}")
-    public ResponseEntity<Task> editTask2(@PathVariable Long id, @RequestBody TaskDto taskDto){
+    public ResponseEntity<Task> editTask2(@PathVariable String id, @RequestBody TaskDto taskDto){
 
         UserId userId = new UserId();
-        TaskId taskId = TaskId.convertFromLong(id);
+        TaskId taskId = new TaskId(id);
 
         if(taskDto.getAssignee() != null) {
             //TODO
             //userId = this.userService.findAssignedUsers(taskDto.getAssignee());
-            userId = taskDto.getAssignee();
+            User assignee = this.userClient.findByUsername(taskDto.getAssignee());
+            userId = assignee.getId();
         }
         else{
             Task task = null;
@@ -110,9 +116,9 @@ public class TasksResource {
     }
 
     @DeleteMapping("/api/tasks/delete/{id}")
-    public ResponseEntity deleteTask2(@PathVariable Long id){
+    public ResponseEntity deleteTask2(@PathVariable String id){
 
-        TaskId taskId = TaskId.convertFromLong(id);
+        TaskId taskId = new TaskId(id);
 
         this.taskService.delete(taskId);
 

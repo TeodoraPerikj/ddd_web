@@ -12,4 +12,12 @@ public class TaskId extends DomainObjectId {
         super(uuid);
     }
 
+    public static TaskId convertFromLong(Long id) {
+        String newId = String.valueOf(id);
+
+        TaskId taskId = new TaskId(newId);
+
+        return taskId;
+    }
+
 }

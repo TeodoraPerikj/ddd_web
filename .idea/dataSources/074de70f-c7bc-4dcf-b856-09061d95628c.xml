@@ -104,7 +104,7 @@ false America/Argentina/San_Luis
 false America/Argentina/Tucuman
 false America/Argentina/Ushuaia
 false America/Aruba
-false America/Asuncion
+true America/Asuncion
 false America/Atikokan
 true America/Atka
 false America/Bahia
@@ -255,12 +255,12 @@ true America/Yellowknife
 false Antarctica/Casey
 false Antarctica/Davis
 false Antarctica/DumontDUrville
-false Antarctica/Macquarie
+true Antarctica/Macquarie
 false Antarctica/Mawson
-false Antarctica/McMurdo
+true Antarctica/McMurdo
 false Antarctica/Palmer
 false Antarctica/Rothera
-false Antarctica/South_Pole
+true Antarctica/South_Pole
 false Antarctica/Syowa
 true Antarctica/Troll
 false Antarctica/Vostok
@@ -376,29 +376,29 @@ false Atlantic/Reykjavik
 false Atlantic/South_Georgia
 false Atlantic/St_Helena
 false Atlantic/Stanley
-false Australia/ACT
-false Australia/Adelaide
+true Australia/ACT
+true Australia/Adelaide
 false Australia/Brisbane
-false Australia/Broken_Hill
-false Australia/Canberra
-false Australia/Currie
+true Australia/Broken_Hill
+true Australia/Canberra
+true Australia/Currie
 false Australia/Darwin
 false Australia/Eucla
-false Australia/Hobart
-false Australia/LHI
+true Australia/Hobart
+true Australia/LHI
 false Australia/Lindeman
-false Australia/Lord_Howe
-false Australia/Melbourne
-false Australia/NSW
+true Australia/Lord_Howe
+true Australia/Melbourne
+true Australia/NSW
 false Australia/North
 false Australia/Perth
 false Australia/Queensland
-false Australia/South
-false Australia/Sydney
-false Australia/Tasmania
-false Australia/Victoria
+true Australia/South
+true Australia/Sydney
+true Australia/Tasmania
+true Australia/Victoria
 false Australia/West
-false Australia/Yancowinna
+true Australia/Yancowinna
 true BDST
 false BDT
 false BNT
@@ -612,7 +612,7 @@ false KRAST
 false KRAT
 false KST
 false Kwajalein
-false LHDT
+true LHDT
 false LHST
 false LIGT
 false LINT
@@ -649,8 +649,8 @@ false NOVT
 false NPT
 false NST
 false NUT
-false NZ
-false NZ-CHAT
+true NZ
+true NZ-CHAT
 true NZDT
 false NZST
 false NZT
@@ -674,11 +674,11 @@ false PST
 true PST8PDT
 false PWT
 true PYST
-false PYT
+true PYT
 false Pacific/Apia
-false Pacific/Auckland
+true Pacific/Auckland
 false Pacific/Bougainville
-false Pacific/Chatham
+true Pacific/Chatham
 false Pacific/Chuuk
 true Pacific/Easter
 false Pacific/Efate
@@ -701,7 +701,7 @@ false Pacific/Marquesas
 false Pacific/Midway
 false Pacific/Nauru
 false Pacific/Niue
-false Pacific/Norfolk
+true Pacific/Norfolk
 false Pacific/Noumea
 false Pacific/Pago_Pago
 false Pacific/Palau
@@ -807,7 +807,7 @@ false Zulu
     <database id="6" parent="1" name="web-tasks">
       <ObjectId>16453</ObjectId>
       <Owner>postgres</Owner>
-      <IntrospectionStateNumber>1161</IntrospectionStateNumber>
+      <IntrospectionStateNumber>1225</IntrospectionStateNumber>
       <Current>1</Current>
     </database>
     <database id="7" parent="1" name="web-users">
@@ -872,7 +872,7 @@ false Zulu
       <Comment>standard public schema</Comment>
       <StateNumber>527</StateNumber>
       <Owner>postgres</Owner>
-      <IntrospectionStateNumber>1162</IntrospectionStateNumber>
+      <IntrospectionStateNumber>1226</IntrospectionStateNumber>
       <Current>1</Current>
     </schema>
     <access-method id="23" parent="6" name="heap">
@@ -942,5 +942,98 @@ false Zulu
     <language id="32" parent="6" name="internal"/>
     <language id="33" parent="6" name="plpgsql"/>
     <language id="34" parent="6" name="sql"/>
+    <table id="35" parent="22" name="task">
+      <ObjectId>16503</ObjectId>
+      <Owner>postgres</Owner>
+      <StateNumber>1181</StateNumber>
+    </table>
+    <column id="36" parent="35" name="id">
+      <Position>1</Position>
+      <DataType>varchar(255)|0s</DataType>
+      <NotNull>1</NotNull>
+      <StateNumber>1181</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="37" parent="35" name="assignee">
+      <Position>2</Position>
+      <DataType>bytea|0s</DataType>
+      <StateNumber>1181</StateNumber>
+      <TypeId>17</TypeId>
+    </column>
+    <column id="38" parent="35" name="comment">
+      <Position>3</Position>
+      <DataType>bytea|0s</DataType>
+      <StateNumber>1181</StateNumber>
+      <TypeId>17</TypeId>
+    </column>
+    <column id="39" parent="35" name="creator">
+      <Position>4</Position>
+      <DataType>bytea|0s</DataType>
+      <StateNumber>1181</StateNumber>
+      <TypeId>17</TypeId>
+    </column>
+    <column id="40" parent="35" name="description">
+      <Position>5</Position>
+      <DataType>varchar(255)|0s</DataType>
+      <StateNumber>1181</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="41" parent="35" name="due_date">
+      <Position>6</Position>
+      <DataType>timestamp|0s</DataType>
+      <StateNumber>1181</StateNumber>
+      <TypeId>1114</TypeId>
+    </column>
+    <column id="42" parent="35" name="estimation_days">
+      <Position>7</Position>
+      <DataType>integer|0s</DataType>
+      <StateNumber>1181</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="43" parent="35" name="start_date">
+      <Position>8</Position>
+      <DataType>timestamp|0s</DataType>
+      <StateNumber>1181</StateNumber>
+      <TypeId>1114</TypeId>
+    </column>
+    <column id="44" parent="35" name="status">
+      <Position>9</Position>
+      <DataType>varchar(255)|0s</DataType>
+      <StateNumber>1181</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="45" parent="35" name="title">
+      <Position>10</Position>
+      <DataType>varchar(255)|0s</DataType>
+      <NotNull>1</NotNull>
+      <StateNumber>1181</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <index id="46" parent="35" name="task_pkey">
+      <ObjectId>16508</ObjectId>
+      <StateNumber>1181</StateNumber>
+      <ColNames>id</ColNames>
+      <Unique>1</Unique>
+      <Primary>1</Primary>
+    </index>
+    <index id="47" parent="35" name="uk_20c7byw48jcthxnvt67bbvijq">
+      <ObjectId>16510</ObjectId>
+      <StateNumber>1183</StateNumber>
+      <ColNames>title</ColNames>
+      <Unique>1</Unique>
+    </index>
+    <key id="48" parent="35" name="task_pkey">
+      <ObjectId>16509</ObjectId>
+      <StateNumber>1181</StateNumber>
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>task_pkey</UnderlyingIndexName>
+    </key>
+    <key id="49" parent="35" name="uk_20c7byw48jcthxnvt67bbvijq">
+      <ObjectId>16511</ObjectId>
+      <StateNumber>1183</StateNumber>
+      <ColNames>title</ColNames>
+      <UnderlyingIndexName>uk_20c7byw48jcthxnvt67bbvijq</UnderlyingIndexName>
+    </key>
   </database-model>
 </dataSource>

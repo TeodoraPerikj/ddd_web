@@ -104,7 +104,7 @@ false America/Argentina/San_Luis
 false America/Argentina/Tucuman
 false America/Argentina/Ushuaia
 false America/Aruba
-false America/Asuncion
+true America/Asuncion
 false America/Atikokan
 true America/Atka
 false America/Bahia
@@ -255,12 +255,12 @@ true America/Yellowknife
 false Antarctica/Casey
 false Antarctica/Davis
 false Antarctica/DumontDUrville
-false Antarctica/Macquarie
+true Antarctica/Macquarie
 false Antarctica/Mawson
-false Antarctica/McMurdo
+true Antarctica/McMurdo
 false Antarctica/Palmer
 false Antarctica/Rothera
-false Antarctica/South_Pole
+true Antarctica/South_Pole
 false Antarctica/Syowa
 true Antarctica/Troll
 false Antarctica/Vostok
@@ -376,29 +376,29 @@ false Atlantic/Reykjavik
 false Atlantic/South_Georgia
 false Atlantic/St_Helena
 false Atlantic/Stanley
-false Australia/ACT
-false Australia/Adelaide
+true Australia/ACT
+true Australia/Adelaide
 false Australia/Brisbane
-false Australia/Broken_Hill
-false Australia/Canberra
-false Australia/Currie
+true Australia/Broken_Hill
+true Australia/Canberra
+true Australia/Currie
 false Australia/Darwin
 false Australia/Eucla
-false Australia/Hobart
-false Australia/LHI
+true Australia/Hobart
+true Australia/LHI
 false Australia/Lindeman
-false Australia/Lord_Howe
-false Australia/Melbourne
-false Australia/NSW
+true Australia/Lord_Howe
+true Australia/Melbourne
+true Australia/NSW
 false Australia/North
 false Australia/Perth
 false Australia/Queensland
-false Australia/South
-false Australia/Sydney
-false Australia/Tasmania
-false Australia/Victoria
+true Australia/South
+true Australia/Sydney
+true Australia/Tasmania
+true Australia/Victoria
 false Australia/West
-false Australia/Yancowinna
+true Australia/Yancowinna
 true BDST
 false BDT
 false BNT
@@ -612,7 +612,7 @@ false KRAST
 false KRAT
 false KST
 false Kwajalein
-false LHDT
+true LHDT
 false LHST
 false LIGT
 false LINT
@@ -649,8 +649,8 @@ false NOVT
 false NPT
 false NST
 false NUT
-false NZ
-false NZ-CHAT
+true NZ
+true NZ-CHAT
 true NZDT
 false NZST
 false NZT
@@ -674,11 +674,11 @@ false PST
 true PST8PDT
 false PWT
 true PYST
-false PYT
+true PYT
 false Pacific/Apia
-false Pacific/Auckland
+true Pacific/Auckland
 false Pacific/Bougainville
-false Pacific/Chatham
+true Pacific/Chatham
 false Pacific/Chuuk
 true Pacific/Easter
 false Pacific/Efate
@@ -701,7 +701,7 @@ false Pacific/Marquesas
 false Pacific/Midway
 false Pacific/Nauru
 false Pacific/Niue
-false Pacific/Norfolk
+true Pacific/Norfolk
 false Pacific/Noumea
 false Pacific/Pago_Pago
 false Pacific/Palau
@@ -811,7 +811,7 @@ false Zulu
     <database id="7" parent="1" name="web-users">
       <ObjectId>16454</ObjectId>
       <Owner>postgres</Owner>
-      <IntrospectionStateNumber>1164</IntrospectionStateNumber>
+      <IntrospectionStateNumber>1222</IntrospectionStateNumber>
       <Current>1</Current>
     </database>
     <role id="8" parent="1" name="pg_database_owner">
@@ -872,7 +872,7 @@ false Zulu
       <Comment>standard public schema</Comment>
       <StateNumber>527</StateNumber>
       <Owner>postgres</Owner>
-      <IntrospectionStateNumber>1165</IntrospectionStateNumber>
+      <IntrospectionStateNumber>1223</IntrospectionStateNumber>
       <Current>1</Current>
     </schema>
     <access-method id="23" parent="7" name="heap">
@@ -942,5 +942,67 @@ false Zulu
     <language id="32" parent="7" name="internal"/>
     <language id="33" parent="7" name="plpgsql"/>
     <language id="34" parent="7" name="sql"/>
+    <table id="35" parent="22" name="app_user">
+      <ObjectId>16512</ObjectId>
+      <Owner>postgres</Owner>
+      <StateNumber>1208</StateNumber>
+    </table>
+    <column id="36" parent="35" name="id">
+      <Position>1</Position>
+      <DataType>varchar(255)|0s</DataType>
+      <NotNull>1</NotNull>
+      <StateNumber>1188</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="37" parent="35" name="name">
+      <Position>2</Position>
+      <DataType>varchar(255)|0s</DataType>
+      <StateNumber>1188</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="38" parent="35" name="password">
+      <Position>3</Position>
+      <DataType>varchar(255)|0s</DataType>
+      <StateNumber>1188</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="39" parent="35" name="surname">
+      <Position>4</Position>
+      <DataType>varchar(255)|0s</DataType>
+      <StateNumber>1188</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="40" parent="35" name="task_assigned">
+      <Position>5</Position>
+      <DataType>bytea|0s</DataType>
+      <StateNumber>1188</StateNumber>
+      <TypeId>17</TypeId>
+    </column>
+    <column id="41" parent="35" name="task_owned">
+      <Position>6</Position>
+      <DataType>bytea|0s</DataType>
+      <StateNumber>1188</StateNumber>
+      <TypeId>17</TypeId>
+    </column>
+    <column id="42" parent="35" name="username">
+      <Position>7</Position>
+      <DataType>varchar(255)|0s</DataType>
+      <StateNumber>1208</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <index id="43" parent="35" name="app_user_pkey">
+      <ObjectId>16517</ObjectId>
+      <StateNumber>1188</StateNumber>
+      <ColNames>id</ColNames>
+      <Unique>1</Unique>
+      <Primary>1</Primary>
+    </index>
+    <key id="44" parent="35" name="app_user_pkey">
+      <ObjectId>16518</ObjectId>
+      <StateNumber>1188</StateNumber>
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>app_user_pkey</UnderlyingIndexName>
+    </key>
   </database-model>
 </dataSource>

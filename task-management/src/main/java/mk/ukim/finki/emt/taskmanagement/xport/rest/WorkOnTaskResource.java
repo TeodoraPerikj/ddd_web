@@ -20,9 +20,9 @@ public class WorkOnTaskResource {
     private final TaskService taskService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<WorkOnTaskDto> showWorkOnTaskPage2(@PathVariable Long id){
+    public ResponseEntity<WorkOnTaskDto> showWorkOnTaskPage2(@PathVariable String id){
 
-        TaskId taskId = TaskId.convertFromLong(id);
+        TaskId taskId = new TaskId(id);
 
         return this.taskService.showWorkOnTaskPage(taskId)
                 .map(workOnTaskDto -> ResponseEntity.ok().body(workOnTaskDto))
@@ -30,9 +30,9 @@ public class WorkOnTaskResource {
     }
 
     @PostMapping("/{id}/finishTask")
-    public ResponseEntity<Task> finishTask2(@PathVariable Long id){
+    public ResponseEntity<Task> finishTask2(@PathVariable String id){
 
-        TaskId taskId = TaskId.convertFromLong(id);
+        TaskId taskId = new TaskId(id);
 
         return this.taskService.changeStatus(taskId, TaskStatus.Done)
                 .map(task -> ResponseEntity.ok().body(task))
@@ -40,22 +40,13 @@ public class WorkOnTaskResource {
     }
 
     @PostMapping("/{id}/cancelTask")
-    public ResponseEntity<Task> cancelTask2(@PathVariable Long id){
+    public ResponseEntity<Task> cancelTask2(@PathVariable String id){
 
-        TaskId taskId = TaskId.convertFromLong(id);
+        TaskId taskId = new TaskId(id);
 
         return this.taskService.changeStatus(taskId, TaskStatus.Canceled)
                 .map(task -> ResponseEntity.ok().body(task))
                 .orElseGet(() -> ResponseEntity.badRequest().build());
     }
-
-//    @PostMapping("/{id}/leaveComment")
-//    public ResponseEntity<Comment> addComment2(@PathVariable CommentId id, @RequestParam String username,
-//                                               @RequestParam String comment){
-//
-//        return this.commentService.create(username, id, comment)
-//                .map(comment1 -> ResponseEntity.ok().body(comment1))
-//                .orElseGet(() -> ResponseEntity.badRequest().build());
-//    }
 
 }

@@ -11,8 +11,11 @@ import java.time.LocalDateTime;
 @Getter
 public class EachTaskDto implements ValueObject {
 
+//    @JsonProperty("id")
+//    private final TaskId id;
+
     @JsonProperty("id")
-    private final TaskId id;
+    private final String id;
 
     @JsonProperty("title")
     private final String title;
@@ -32,39 +35,57 @@ public class EachTaskDto implements ValueObject {
     @JsonProperty("status")
     private final TaskStatus status;
 
+//    @JsonProperty("assignee")
+//    private final UserId assignee;
+//
+//    @JsonProperty("creator")
+//    private final UserId creator;
+//
+//    @JsonProperty("comment")
+//    private final CommentId comment;
+
     @JsonProperty("assignee")
-    private final UserId assignee;
+    private final String assignee;
 
     @JsonProperty("creator")
-    private final UserId creator;
+    private final String creator;
 
     @JsonProperty("comment")
-    private final CommentId comment;
+    private final String comment;
+
 
     private EachTaskDto() {
-        this.id = TaskId.randomId(TaskId.class);
+        //this.id = TaskId.randomId(TaskId.class);
+        this.id = "";
         this.title = "";
         this.description = "";
         this.startDate = LocalDateTime.now();
         this.dueDate = LocalDateTime.now();
         this.estimationDays = 0;
         this.status = TaskStatus.TODO;
-        this.assignee = UserId.randomId(UserId.class);
-        this.creator = UserId.randomId(UserId.class);
-        this.comment = CommentId.randomId(CommentId.class);
+//        this.assignee = UserId.randomId(UserId.class);
+//        this.creator = UserId.randomId(UserId.class);
+//        this.comment = CommentId.randomId(CommentId.class);
+        this.assignee = "";
+        this.creator = "";
+        this.comment = "";
     }
 
     @JsonCreator
-    public EachTaskDto(@JsonProperty("id") TaskId id,
+    public EachTaskDto(@JsonProperty("id") String id,
+//                       @JsonProperty("id") TaskId id,
                        @JsonProperty("title") String title,
                        @JsonProperty("description") String description,
                        @JsonProperty("startDate") LocalDateTime startDate,
                        @JsonProperty("dueDate") LocalDateTime dueDate,
                        @JsonProperty("estimationDays") Integer estimationDays,
                        @JsonProperty("status") TaskStatus status,
-                       @JsonProperty("assignee") UserId assignee,
-                       @JsonProperty("creator") UserId creator,
-                       @JsonProperty("comment") CommentId comment) {
+//                       @JsonProperty("assignee") UserId assignee,
+//                       @JsonProperty("creator") UserId creator,
+//                       @JsonProperty("comment") CommentId comment) {
+                       @JsonProperty("assignee") String assignee,
+                       @JsonProperty("creator") String creator,
+                       @JsonProperty("comment") String comment){
         this.id = id;
         this.title = title;
         this.description = description;

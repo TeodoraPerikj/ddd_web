@@ -38,6 +38,8 @@ public class Task extends AbstractEntity<TaskId> {
         super(TaskId.randomId(TaskId.class));
     }
 
+//    public Task(Long id){super(TaskId.convertFromLong(id));}
+
     public void changeTitle(String title){
         this.title = title;
     }

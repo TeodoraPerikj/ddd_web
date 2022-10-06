@@ -17,6 +17,9 @@ public class User implements ValueObject {
     @JsonProperty("surname")
     private final String surname;
 
+    @JsonProperty("username")
+    private final String username;
+
     @JsonProperty("password")
     private final String password;
 
@@ -24,17 +27,20 @@ public class User implements ValueObject {
         this.id = UserId.randomId(UserId.class);
         this.name = "";
         this.surname = "";
+        this.username = "";
         this.password = "";
     }
 
     @JsonCreator
-    public User(@JsonProperty("id") UserId id,
+    public User(@JsonProperty("username") String username,
+            //@JsonProperty("id") UserId id,
                 @JsonProperty("name") String name,
                 @JsonProperty("surname") String surname,
                 @JsonProperty("password") String password) {
-        this.id = id;
+        this.id = UserId.randomId(UserId.class);
         this.name = name;
         this.surname = surname;
+        this.username = username;
         this.password = password;
     }
 }

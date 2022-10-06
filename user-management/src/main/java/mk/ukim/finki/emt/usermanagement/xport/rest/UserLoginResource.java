@@ -22,7 +22,7 @@ public class UserLoginResource {
     @PostMapping
     public ResponseEntity<User> login2(@RequestBody UserLoginDto userLoginDto){
 
-        UserId username = userLoginDto.getUsername();
+        String username = userLoginDto.getUsername();
         String password = userLoginDto.getPassword();
 
         UserLoginForm userLoginForm = new UserLoginForm();

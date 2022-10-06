@@ -16,9 +16,9 @@ public class TaskInfoResource {
     private final TaskService taskService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<TaskInfoDto> showTaskInfo2(@PathVariable Long id, @RequestParam String username){
+    public ResponseEntity<TaskInfoDto> showTaskInfo2(@PathVariable String id, @RequestParam String username){
 
-        TaskId taskId = TaskId.convertFromLong(id);
+        TaskId taskId = new TaskId(id);
 
         return this.taskService.showTaskInfo(taskId, username)
                 .map(taskInfoDto -> ResponseEntity.ok().body(taskInfoDto))

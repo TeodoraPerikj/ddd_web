@@ -1,14 +1,19 @@
 package mk.ukim.finki.emt.taskmanagement.xport.client;
 
+import mk.ukim.finki.emt.taskmanagement.domain.model.Task;
+import mk.ukim.finki.emt.taskmanagement.domain.model.TaskId;
 import mk.ukim.finki.emt.taskmanagement.domain.valueobjects.User;
+import mk.ukim.finki.emt.taskmanagement.domain.valueobjects.UserId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,4 +46,65 @@ public class UserClient {
         }
     }
 
+    public User findByUsername(String username) {
+        try {
+            String path = "/api/findByUsername";
+
+            URI uri = uri().path(path).queryParam("username", username).build().toUri();
+
+            User user = restTemplate.exchange(uri, HttpMethod.GET, null,
+                    new ParameterizedTypeReference<User>() {}).getBody();
+
+            return user;
+        } catch (Exception e) {
+            return null;
+        }
+
+    }
+
+    public User findById(UserId userId) {
+        try {
+            String path = "/api/findById";
+
+            URI uri = uri().path(path).queryParam("userId", userId).build().toUri();
+
+            User user = restTemplate.exchange(uri, HttpMethod.GET, null,
+                    new ParameterizedTypeReference<User>() {}).getBody();
+
+            return user;
+        } catch (Exception e) {
+            return null;
+        }
+
+    }
+
+    public Boolean setTaskAssigned(TaskId taskId, UserId userId) {
+        try {
+            String path = "/api/setTaskAssigned";
+
+            URI uri = uri().path(path).queryParam("taskId", taskId).queryParam("userId", userId).
+                    build().toUri();
+
+            return restTemplate.exchange(uri, HttpMethod.POST, null,
+                    new ParameterizedTypeReference<Boolean>() {}).getBody();
+        } catch (Exception e) {
+            return false;
+        }
+
+    }
+
+    public Boolean setTaskOwned(TaskId taskId, UserId userId) {
+        try {
+            String path = "/api/setTaskOwned";
+
+            URI uri = uri().path(path).queryParam("taskId", taskId).queryParam("userId", userId).
+                    build().toUri();
+
+            return restTemplate.exchange(uri, HttpMethod.POST, null,
+                    new ParameterizedTypeReference<Boolean>() {}).getBody();
+        } catch (Exception e) {
+            return false;
+        }
+
+    }
 }

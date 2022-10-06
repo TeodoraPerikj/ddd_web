@@ -21,11 +21,17 @@ public class TaskDto {
     @JsonProperty("estimationDays")
     private final String estimationDays;
 
+//    @JsonProperty("assignee")
+//    private final UserId assignee;
+//
+//    @JsonProperty("creator")
+//    private final UserId creator;
+
     @JsonProperty("assignee")
-    private final UserId assignee;
+    private final String assignee;
 
     @JsonProperty("creator")
-    private final UserId creator;
+    private final String creator;
 
     //// MAKE THEM STRING IF NEEDED
 
@@ -35,8 +41,10 @@ public class TaskDto {
         this.startDate = "";
         this.dueDate = "";
         this.estimationDays = "";
-        this.assignee = UserId.randomId(UserId.class);
-        this.creator = UserId.randomId(UserId.class);
+//        this.assignee = UserId.randomId(UserId.class);
+//        this.creator = UserId.randomId(UserId.class);
+        this.assignee = "";
+        this.creator = "";
     }
     @JsonCreator
     public TaskDto(@JsonProperty("title") String title,
@@ -44,8 +52,10 @@ public class TaskDto {
                    @JsonProperty("startDate") String startDate,
                    @JsonProperty("dueDate") String dueDate,
                    @JsonProperty("estimationDays") String estimationDays,
-                   @JsonProperty("assignee") UserId assignee,
-                   @JsonProperty("creator") UserId creator){
+//                   @JsonProperty("assignee") UserId assignee,
+//                   @JsonProperty("creator") UserId creator){
+                   @JsonProperty("assignee") String assignee,
+                   @JsonProperty("creator") String creator){
         this.title = title;
         this.description = description;
         this.startDate = startDate;

@@ -35,4 +35,12 @@ public class DomainObjectId implements Serializable {
             throw new RuntimeException("Could not create new instance of " + idClass, ex);
         }
     }
+
+    @Override
+    public String toString() {
+//        return "DomainObjectId{" +
+//                "id='" + id + '\'' +
+//                '}';
+        return id;
+    }
 }

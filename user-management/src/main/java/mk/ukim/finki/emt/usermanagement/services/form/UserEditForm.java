@@ -8,8 +8,11 @@ import javax.validation.constraints.NotNull;
 @Data
 public class UserEditForm {
 
+//    @NotNull
+//    private UserId username;
+
     @NotNull
-    private UserId username;
+    private String username;
 
     @NotNull
     private String name;

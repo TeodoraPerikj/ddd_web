@@ -9,19 +9,24 @@ import mk.ukim.finki.emt.usermanagement.domain.model.UserId;
 @Getter
 public class UserLoginDto implements ValueObject {
 
+//    @JsonProperty("username")
+//    private final UserId username;
+
     @JsonProperty("username")
-    private final UserId username;
+    private final String username;
 
     @JsonProperty("password")
     private final String password;
 
     public UserLoginDto() {
-        this.username = UserId.randomId(UserId.class);
+//        this.username = UserId.randomId(UserId.class);
+        this.username = "";
         this.password = "";
     }
 
     @JsonCreator
-    public UserLoginDto(@JsonProperty("username") UserId username,
+    public UserLoginDto(@JsonProperty("username") String username,
+            //@JsonProperty("username") UserId username,
                         @JsonProperty("password") String password) {
         this.username = username;
         this.password = password;

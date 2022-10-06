@@ -15,19 +15,24 @@ public class TaskInfoDto implements ValueObject {
     @JsonProperty("textAndType")
     private final String textAndType;
 
+//    @JsonProperty("assignee")
+//    private final UserId assignee;
+
     @JsonProperty("assignee")
-    private final UserId assignee;
+    private final String assignee;
 
     private TaskInfoDto() {
         this.task = new Task();
         this.textAndType = "";
-        this.assignee = UserId.randomId(UserId.class);
+        //this.assignee = UserId.randomId(UserId.class);
+        this.assignee = "";
     }
 
     @JsonCreator
     public TaskInfoDto(@JsonProperty("task") Task task,
                        @JsonProperty("textAndType") String textAndType,
-                       @JsonProperty("assignee") UserId assignee) {
+                       //@JsonProperty("assignee") UserId assignee)
+                       @JsonProperty("assignee") String assignee){
         this.task = task;
         this.textAndType = textAndType;
         this.assignee = assignee;

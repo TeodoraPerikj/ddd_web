@@ -12,4 +12,12 @@ public class CommentId extends DomainObjectId {
     public CommentId(@NonNull String uuid) {
         super(uuid);
     }
+
+    public static CommentId convertFromLong(Long id) {
+        String newId = String.valueOf(id);
+
+        CommentId commentId = new CommentId(newId);
+
+        return commentId;
+    }
 }

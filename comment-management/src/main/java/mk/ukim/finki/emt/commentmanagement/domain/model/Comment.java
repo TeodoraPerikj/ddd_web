@@ -1,5 +1,6 @@
 package mk.ukim.finki.emt.commentmanagement.domain.model;
 
+import lombok.Getter;
 import mk.ukim.finki.emt.commentmanagement.domain.valueobjects.TaskId;
 import mk.ukim.finki.emt.commentmanagement.domain.valueobjects.UserId;
 import mk.ukim.finki.emt.sharedkernel.domain.base.AbstractEntity;
@@ -11,6 +12,7 @@ import javax.persistence.Entity;
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
 public class Comment extends AbstractEntity<CommentId> {
 
     @AttributeOverride(name = "id", column = @Column(name = "user_id", nullable = false))

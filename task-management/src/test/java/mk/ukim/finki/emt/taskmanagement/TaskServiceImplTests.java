@@ -57,4 +57,11 @@ public class TaskServiceImplTests {
 
         Assertions.assertEquals(3, taskService.listAll().size());
     }
+
+    @Test
+    public void testFindByUsername(){
+        User user = userClient.findByUsername("user1");
+
+        Assertions.assertEquals("user1", user.getUsername());
+    }
 }

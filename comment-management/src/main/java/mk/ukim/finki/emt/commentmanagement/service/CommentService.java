@@ -2,23 +2,24 @@ package mk.ukim.finki.emt.commentmanagement.service;
 
 import mk.ukim.finki.emt.commentmanagement.domain.model.Comment;
 import mk.ukim.finki.emt.commentmanagement.domain.model.CommentId;
+import mk.ukim.finki.emt.commentmanagement.domain.valueobjects.CommentsDto;
 import mk.ukim.finki.emt.commentmanagement.service.form.CommentForm;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CommentService {
 
-    Comment create(CommentForm commentForm);
+    Optional<Comment> create(CommentForm commentForm);
 
-    Comment edit(CommentId id, String comment);
+    Optional<Comment> edit(CommentId id, String comment);
 
     void delete(CommentId id);
 
-    Comment findById(CommentId id);
-
-    //List<CommentsDto> showCommentsDto();
+    Optional<Comment> findById(CommentId id);
 
     List<Comment> listAll();
 
-    //List<CommentsForTaskDto> findByCommentProjection(Long id);
+    List<CommentsDto> showCommentsDto();
+
 }

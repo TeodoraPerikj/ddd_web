@@ -1,12 +1,16 @@
 package mk.ukim.finki.emt.usermanagement.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 import mk.ukim.finki.emt.sharedkernel.domain.base.AbstractEntity;
+import mk.ukim.finki.emt.usermanagement.domain.valueobjects.Task;
+import mk.ukim.finki.emt.usermanagement.domain.valueobjects.TaskId;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "app_user")
+@Getter
 public class User extends AbstractEntity<UserId> {
 
     @JsonProperty("name")
@@ -15,19 +19,47 @@ public class User extends AbstractEntity<UserId> {
     @JsonProperty("surname")
     private String surname;
 
+    @JsonProperty("username")
+    private String username;
+
     @JsonProperty("password")
     private String password;
 
-    private User(){
+    @JsonProperty("taskAssigned")
+    private TaskId taskAssigned;
+
+    @JsonProperty("taskOwned")
+    private TaskId taskOwned;
+
+    public User(){
         super(UserId.randomId(UserId.class));
     }
 
-    public static User build(String name, String surname, String password){
+//    public User(String username){
+//        super(new UserId(username));
+//    }
+
+    public static User build(String username, String name, String surname, String password){
         User user = new User();
 
         user.name = name;
         user.surname = surname;
+        user.username = username;
         user.password = password;
+
+        return user;
+    }
+
+    public static User createUserWithTasks(String username, String name, String surname, String password,
+                                           TaskId taskAssigned, TaskId taskOwned){
+        User user = new User();
+
+        user.name = name;
+        user.surname = surname;
+        user.username = username;
+        user.password = password;
+        user.taskAssigned = taskAssigned;
+        user.taskOwned = taskOwned;
 
         return user;
     }
@@ -44,27 +76,13 @@ public class User extends AbstractEntity<UserId> {
         this.password = password;
     }
 
-//    @JsonIgnore
-//    @ManyToMany(mappedBy = "assignees", fetch = FetchType.EAGER)
-//    private List<Task> taskAssigned;
-//
-//
-//    @ManyToMany(mappedBy = "assignees", fetch = FetchType.EAGER)
-//    private List<Task> taskAssigned;
+    public void changeUsername(String username){this.username = username;}
 
+    public void changeTaskAssigned(TaskId taskAssigned){
+        this.taskAssigned = taskAssigned;
+    }
 
-//    @JsonIgnore
-//    @OneToMany(mappedBy = "creator", fetch = FetchType.EAGER)
-//    private List<Task> taskOwned;
-////
-//    public User() {
-//    }
-//
-//    public User(String name, String surname, String password) {
-//
-//        this.name = name;
-//        this.surname = surname;
-//        this.password = password;
-//        this.taskAssigned = new ArrayList<>();
-//    }
+    public void changeTaskOwned(TaskId taskOwned){
+        this.taskOwned = taskOwned;
+    }
 }

@@ -1,9 +1,7 @@
 package mk.ukim.finki.emt.taskmanagement.service.impl;
 
 import lombok.AllArgsConstructor;
-import mk.ukim.finki.emt.taskmanagement.domain.exceptions.EstimationDaysGreaterThanDaysToWorkOnTaskException;
-import mk.ukim.finki.emt.taskmanagement.domain.exceptions.LocalDateTimeException;
-import mk.ukim.finki.emt.taskmanagement.domain.exceptions.TaskNotFoundException;
+import mk.ukim.finki.emt.taskmanagement.domain.exceptions.*;
 import mk.ukim.finki.emt.taskmanagement.domain.model.Task;
 import mk.ukim.finki.emt.taskmanagement.domain.model.TaskId;
 import mk.ukim.finki.emt.taskmanagement.domain.repository.TaskRepository;
@@ -11,6 +9,7 @@ import mk.ukim.finki.emt.taskmanagement.domain.valueobjects.*;
 import mk.ukim.finki.emt.taskmanagement.service.TaskService;
 import mk.ukim.finki.emt.taskmanagement.service.form.TaskCreateForm;
 import mk.ukim.finki.emt.taskmanagement.service.form.TaskEditForm;
+import mk.ukim.finki.emt.taskmanagement.xport.client.UserClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -27,6 +25,7 @@ import java.util.stream.Collectors;
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
+    private final UserClient userClient;
 
     @Override
     public Optional<Task> create(TaskCreateForm taskForm) {
@@ -45,9 +44,16 @@ public class TaskServiceImpl implements TaskService {
 
         if(localStartDate.isAfter(localDueDate))
             throw new LocalDateTimeException();
+        
+        //TODO: POST to User Management Application to set TaskId Assigned and TaskId Owned
 
         Task task = Task.build(taskForm.getTitle(), taskForm.getDescription(), localStartDate,
                 localDueDate, taskForm.getEstimationDays(), taskForm.getCreator(), taskForm.getAssignee());
+
+        if(!this.userClient.setTaskAssigned(task.getId(), task.getAssignee()))
+            throw new CannotAssignedTask(task.getAssignee().getId(), task.getId().toString());
+        if(!this.userClient.setTaskOwned(task.getId(), task.getCreator()))
+            throw new CannotOwnedTask(task.getCreator().getId(), task.getId().toString());
 
         return Optional.of(taskRepository.saveAndFlush(task));
     }
@@ -108,14 +114,20 @@ public class TaskServiceImpl implements TaskService {
 
         for(Task task : tasks){
 
-            UserId assignee = task.getAssignee();
+//            UserId assignee = task.getAssignee();
+//
+//            UserId creator = task.getCreator();
 
-            UserId creator = task.getCreator();
+            User assignee = this.userClient.findById(task.getAssignee());
+            User creator = this.userClient.findById(task.getCreator());
+
+            //TODO: Find by Username and then by Id
 
             CommentId commentId = task.getComment();
 
-            EachTaskDto eachTaskDto = new EachTaskDto(task.getId(), task.getTitle(), task.getDescription(), task.getStartDate(),
-                    task.getDueDate(), task.getEstimationDays(), task.getStatus(), assignee, creator, commentId);
+            EachTaskDto eachTaskDto = new EachTaskDto(task.getId().toString(), task.getTitle(), task.getDescription(),
+                    task.getStartDate(), task.getDueDate(), task.getEstimationDays(), task.getStatus(),
+                    assignee.getUsername(), creator.getUsername(), commentId.toString());
 
             eachTaskDtos.add(eachTaskDto);
         }
@@ -132,7 +144,7 @@ public class TaskServiceImpl implements TaskService {
         String textAndType = this.filter(task, userId);
         UserId assignee = task.getAssignee();
 
-        TaskInfoDto taskInfoDto = new TaskInfoDto(task, textAndType, assignee);
+        TaskInfoDto taskInfoDto = new TaskInfoDto(task, textAndType, assignee.getId());
 
         return Optional.of(taskInfoDto);
     }
@@ -152,13 +164,13 @@ public class TaskServiceImpl implements TaskService {
 
             if(task.getStatus().equals(TaskStatus.TODO)){
 
-                if (task.getAssignee().equals(username))
+                if (task.getAssignee().getId().equals(username))
                     return "Start Task";
 
                 return "Join Task";
             } else if(task.getStatus().equals(TaskStatus.InProgress)) {
 
-                if (task.getAssignee().equals(username))
+                if (task.getAssignee().getId().equals(username))
                     return "Continue Task";
 
                 return "Join Task";
@@ -187,7 +199,7 @@ public class TaskServiceImpl implements TaskService {
 
         CommentId commentId = task.getComment();
 
-        WorkOnTaskDto workOnTaskDto = new WorkOnTaskDto(task, assignee, commentId);
+        WorkOnTaskDto workOnTaskDto = new WorkOnTaskDto(task, assignee.getId(), commentId.getId());
 
         return Optional.of(workOnTaskDto);
     }
