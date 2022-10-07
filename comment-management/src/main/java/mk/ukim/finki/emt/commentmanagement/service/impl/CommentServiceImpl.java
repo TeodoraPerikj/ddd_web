@@ -1,13 +1,18 @@
 package mk.ukim.finki.emt.commentmanagement.service.impl;
 
 import lombok.AllArgsConstructor;
+import mk.ukim.finki.emt.commentmanagement.domain.exceptions.CannotDeleteCommentFromTask;
+import mk.ukim.finki.emt.commentmanagement.domain.exceptions.CannotSetCommentToTask;
 import mk.ukim.finki.emt.commentmanagement.domain.exceptions.CommentNotFoundException;
 import mk.ukim.finki.emt.commentmanagement.domain.model.Comment;
 import mk.ukim.finki.emt.commentmanagement.domain.model.CommentId;
 import mk.ukim.finki.emt.commentmanagement.domain.repository.CommentRepository;
 import mk.ukim.finki.emt.commentmanagement.domain.valueobjects.CommentsDto;
+import mk.ukim.finki.emt.commentmanagement.domain.valueobjects.Task;
+import mk.ukim.finki.emt.commentmanagement.domain.valueobjects.TaskId;
 import mk.ukim.finki.emt.commentmanagement.service.CommentService;
 import mk.ukim.finki.emt.commentmanagement.service.form.CommentForm;
+import mk.ukim.finki.emt.commentmanagement.xport.client.TaskClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +28,7 @@ import java.util.Optional;
 public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
+    private final TaskClient taskClient;
 
     @Override
     public Optional<Comment> create(CommentForm commentForm) {
@@ -33,6 +39,9 @@ public class CommentServiceImpl implements CommentService {
                 commentForm.getTaskId(),
                 commentForm.getComment(),
                 LocalDateTime.now());
+
+        if(!this.taskClient.setComment(commentForm.getTaskId(), comment.getId()))
+            throw new CannotSetCommentToTask(commentForm.getTaskId().toString(), comment.getId().getId());
 
         commentRepository.saveAndFlush(comment);
 
@@ -51,11 +60,16 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void delete(CommentId id) {
+    public boolean delete(CommentId commentId) {
 
-        Comment comment = commentRepository.findById(id).orElseThrow(CommentNotFoundException::new);
+        Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+
+        if(!this.taskClient.deleteCommentFromTask(comment.getTaskId()))
+            throw new CannotDeleteCommentFromTask(comment.getId().getId(), comment.getTaskId().getId());
 
         commentRepository.delete(comment);
+
+        return true;
     }
 
     @Override
@@ -73,7 +87,10 @@ public class CommentServiceImpl implements CommentService {
         List<CommentsDto> commentsDtos = new ArrayList<>();
 
         for(Comment comment:this.commentRepository.findAll()){
-           // commentsDtos.add(new CommentsDto(comment.getComment(),comment.getTask().getTitle()));
+
+            Task task = this.taskClient.findById(comment.getTaskId());
+
+            commentsDtos.add(new CommentsDto(comment.getComment(),task.getTitle()));
         }
 
         return commentsDtos;

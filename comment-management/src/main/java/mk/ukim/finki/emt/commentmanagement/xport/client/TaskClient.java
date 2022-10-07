@@ -1,7 +1,10 @@
-package mk.ukim.finki.emt.usermanagement.xport.client;
+package mk.ukim.finki.emt.commentmanagement.xport.client;
 
-import mk.ukim.finki.emt.usermanagement.domain.valueobjects.Task;
-import mk.ukim.finki.emt.usermanagement.domain.valueobjects.TaskId;
+import mk.ukim.finki.emt.commentmanagement.domain.model.CommentId;
+import mk.ukim.finki.emt.commentmanagement.domain.valueobjects.Task;
+import mk.ukim.finki.emt.commentmanagement.domain.valueobjects.TaskId;
+import mk.ukim.finki.emt.commentmanagement.domain.valueobjects.User;
+import mk.ukim.finki.emt.commentmanagement.domain.valueobjects.UserId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -50,8 +53,7 @@ public class TaskClient {
             URI uri = uri().path(path).queryParam("taskId", taskId).build().toUri();
 
             Task task = restTemplate.exchange(uri, HttpMethod.GET, null,
-                    new ParameterizedTypeReference<Task>() {
-                    }).getBody();
+                    new ParameterizedTypeReference<Task>() {}).getBody();
 
             return task;
         } catch (Exception e) {
@@ -60,31 +62,29 @@ public class TaskClient {
 
     }
 
-    public Boolean deleteTaskAssigned(TaskId taskId) {
+    public Boolean setComment(TaskId taskId, CommentId commentId) {
         try {
-            String path = "/api/deleteTaskAssigned";
+            String path = "/api/setComment";
 
-            URI uri = uri().path(path).queryParam("taskId", taskId).
+            URI uri = uri().path(path).queryParam("taskId", taskId).queryParam("commentId", commentId).
                     build().toUri();
 
-            return restTemplate.exchange(uri, HttpMethod.DELETE, null,
-                    new ParameterizedTypeReference<Boolean>() {
-                    }).getBody();
+            return restTemplate.exchange(uri, HttpMethod.POST, null,
+                    new ParameterizedTypeReference<Boolean>() {}).getBody();
         } catch (Exception e) {
             return false;
         }
     }
 
-    public Boolean deleteTaskOwned(TaskId taskId) {
+    public Boolean deleteCommentFromTask(TaskId taskId) {
         try {
-            String path = "/api/deleteTaskOwned";
+            String path = "/api/deleteComment";
 
             URI uri = uri().path(path).queryParam("taskId", taskId).
                     build().toUri();
 
             return restTemplate.exchange(uri, HttpMethod.DELETE, null,
-                    new ParameterizedTypeReference<Boolean>() {
-                    }).getBody();
+                    new ParameterizedTypeReference<Boolean>() {}).getBody();
         } catch (Exception e) {
             return false;
         }

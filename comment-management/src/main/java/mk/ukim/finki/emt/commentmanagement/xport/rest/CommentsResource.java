@@ -3,11 +3,10 @@ package mk.ukim.finki.emt.commentmanagement.xport.rest;
 import lombok.AllArgsConstructor;
 import mk.ukim.finki.emt.commentmanagement.domain.model.Comment;
 import mk.ukim.finki.emt.commentmanagement.domain.model.CommentId;
-import mk.ukim.finki.emt.commentmanagement.domain.valueobjects.CommentsDto;
-import mk.ukim.finki.emt.commentmanagement.domain.valueobjects.TaskId;
-import mk.ukim.finki.emt.commentmanagement.domain.valueobjects.UserId;
+import mk.ukim.finki.emt.commentmanagement.domain.valueobjects.*;
 import mk.ukim.finki.emt.commentmanagement.service.CommentService;
 import mk.ukim.finki.emt.commentmanagement.service.form.CommentForm;
+import mk.ukim.finki.emt.commentmanagement.xport.client.UserClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +17,9 @@ import java.util.List;
 @RequestMapping("/api/comments")
 @AllArgsConstructor
 public class CommentsResource {
+
     private final CommentService commentService;
+    private final UserClient userClient;
 
     @GetMapping
     public List<CommentsDto> showComments(){
@@ -41,7 +42,10 @@ public class CommentsResource {
                                                @RequestParam String comment){
 
         TaskId taskId = new TaskId(id);
-        UserId userId = new UserId(username);
+
+        User user = this.userClient.findByUsername(username);
+
+        UserId userId = user.getId();
 
         CommentForm commentForm = new CommentForm();
 
@@ -52,5 +56,22 @@ public class CommentsResource {
         return this.commentService.create(commentForm)
                 .map(comment1 -> ResponseEntity.ok().body(comment1))
                 .orElseGet(() -> ResponseEntity.badRequest().build());
+    }
+
+    @GetMapping("/findById")
+    public ResponseEntity<Comment> findById(@RequestParam("commentId") CommentId commentId){
+
+        return this.commentService.findById(commentId)
+                .map(comment -> ResponseEntity.ok().body(comment))
+                .orElseGet(() -> ResponseEntity.badRequest().build());
+    }
+
+    @DeleteMapping("/delete")
+    public Boolean deleteComment(@RequestParam CommentId commentId){
+
+        if(this.commentService.delete(commentId))
+            return true;
+
+        return false;
     }
 }

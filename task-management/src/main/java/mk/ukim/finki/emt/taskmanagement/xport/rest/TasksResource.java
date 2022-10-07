@@ -3,10 +3,7 @@ package mk.ukim.finki.emt.taskmanagement.xport.rest;
 import lombok.AllArgsConstructor;
 import mk.ukim.finki.emt.taskmanagement.domain.model.Task;
 import mk.ukim.finki.emt.taskmanagement.domain.model.TaskId;
-import mk.ukim.finki.emt.taskmanagement.domain.valueobjects.EachTaskDto;
-import mk.ukim.finki.emt.taskmanagement.domain.valueobjects.TaskDto;
-import mk.ukim.finki.emt.taskmanagement.domain.valueobjects.User;
-import mk.ukim.finki.emt.taskmanagement.domain.valueobjects.UserId;
+import mk.ukim.finki.emt.taskmanagement.domain.valueobjects.*;
 import mk.ukim.finki.emt.taskmanagement.service.TaskService;
 import mk.ukim.finki.emt.taskmanagement.service.form.TaskCreateForm;
 import mk.ukim.finki.emt.taskmanagement.service.form.TaskEditForm;
@@ -92,6 +89,7 @@ public class TasksResource {
             if(this.taskService.findById(taskId).isPresent())
                 task = this.taskService.findById(taskId).get();
 
+            assert task != null;
             userId = task.getAssignee();
         }
 
@@ -128,4 +126,35 @@ public class TasksResource {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/api/findById")
+    public ResponseEntity<Task> findById(@RequestParam("taskId") TaskId taskId){
+        return this.taskService.findById(taskId)
+                .map(task -> ResponseEntity.ok().body(task))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/api/setComment")
+    public Boolean setComment(@RequestParam TaskId taskId,
+                              @RequestParam CommentId commentId){
+
+        return this.taskService.setComment(taskId, commentId);
+    }
+
+    @DeleteMapping("/api/deleteComment")
+    public Boolean deleteComment(@RequestParam TaskId taskId){
+
+        return this.taskService.deleteComment(taskId);
+    }
+
+    @DeleteMapping("/api/deleteTaskAssigned")
+    public Boolean deleteTaskAssigned(@RequestParam TaskId taskId){
+
+        return this.taskService.deleteTaskAssigned(taskId);
+    }
+
+    @DeleteMapping("/api/deleteTaskOwned")
+    public Boolean deleteTaskOwned(@RequestParam TaskId taskId){
+
+        return this.taskService.delete(taskId);
+    }
 }

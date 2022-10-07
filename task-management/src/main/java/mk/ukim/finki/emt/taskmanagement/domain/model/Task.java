@@ -38,8 +38,6 @@ public class Task extends AbstractEntity<TaskId> {
         super(TaskId.randomId(TaskId.class));
     }
 
-//    public Task(Long id){super(TaskId.convertFromLong(id));}
-
     public void changeTitle(String title){
         this.title = title;
     }
@@ -60,11 +58,11 @@ public class Task extends AbstractEntity<TaskId> {
         this.estimationDays = estimationDays;
     }
 
-    public void changeStatus(TaskStatus status){
-        this.status = status;
-    }
+    public void changeStatus(TaskStatus status) {this.status = status;}
 
     public void changeAssignee(UserId assignee) {this.assignee = assignee;}
+
+    public void changeComment(CommentId comment) {this.comment = comment;}
 
     public static Task build(String title, String description, LocalDateTime startDate, LocalDateTime dueDate,
                              Integer estimationDays, UserId creator, UserId assignee){
@@ -79,7 +77,6 @@ public class Task extends AbstractEntity<TaskId> {
         task.status = TaskStatus.TODO;
         task.creator = creator;
         task.assignee = assignee;
-        task.comment = CommentId.randomId(CommentId.class);
 
         return task;
     }

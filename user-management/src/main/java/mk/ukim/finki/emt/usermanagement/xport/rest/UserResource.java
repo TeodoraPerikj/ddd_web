@@ -69,4 +69,21 @@ public class UserResource {
         return false;
     }
 
+    @DeleteMapping("/deleteTaskAssigned")
+    public Boolean deleteTaskAssigned(@RequestParam UserId userId){
+
+        if(this.userService.deleteTaskAssigned(userId))
+            return true;
+
+        return false;
+    }
+
+    @DeleteMapping("/deleteTaskOwned")
+    public Boolean deleteTaskOwned(@RequestParam UserId userId){
+
+        if(this.userService.deleteTaskOwned(userId))
+            return true;
+
+        return false;
+    }
 }

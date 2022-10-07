@@ -2,10 +2,7 @@ package mk.ukim.finki.emt.taskmanagement.service;
 
 import mk.ukim.finki.emt.taskmanagement.domain.model.Task;
 import mk.ukim.finki.emt.taskmanagement.domain.model.TaskId;
-import mk.ukim.finki.emt.taskmanagement.domain.valueobjects.EachTaskDto;
-import mk.ukim.finki.emt.taskmanagement.domain.valueobjects.TaskInfoDto;
-import mk.ukim.finki.emt.taskmanagement.domain.valueobjects.TaskStatus;
-import mk.ukim.finki.emt.taskmanagement.domain.valueobjects.WorkOnTaskDto;
+import mk.ukim.finki.emt.taskmanagement.domain.valueobjects.*;
 import mk.ukim.finki.emt.taskmanagement.service.form.TaskCreateForm;
 import mk.ukim.finki.emt.taskmanagement.service.form.TaskEditForm;
 
@@ -18,7 +15,7 @@ public interface TaskService {
 
     Optional<Task> edit(TaskId id, TaskEditForm taskForm);
 
-    void delete(TaskId id);
+    boolean delete(TaskId id);
 
     List<Task> listAll();
 
@@ -26,11 +23,17 @@ public interface TaskService {
 
     List<EachTaskDto> findEachTask();
 
-    Optional<TaskInfoDto> showTaskInfo(TaskId taskId, String userId);
+    Optional<TaskInfoDto> showTaskInfo(TaskId taskId, String activeUser);
 
     String filter(Task task, String username);
 
     Optional<WorkOnTaskDto> showWorkOnTaskPage(TaskId taskId);
 
     Optional<Task> changeStatus(TaskId id, TaskStatus status);
+
+    Boolean setComment(TaskId taskId, CommentId commentId);
+
+    Boolean deleteComment(TaskId taskId);
+
+    Boolean deleteTaskAssigned(TaskId taskId);
 }

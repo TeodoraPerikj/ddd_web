@@ -1,13 +1,11 @@
-package mk.ukim.finki.emt.taskmanagement.xport.client;
+package mk.ukim.finki.emt.commentmanagement.xport.client;
 
-import mk.ukim.finki.emt.taskmanagement.domain.model.Task;
-import mk.ukim.finki.emt.taskmanagement.domain.model.TaskId;
-import mk.ukim.finki.emt.taskmanagement.domain.valueobjects.User;
-import mk.ukim.finki.emt.taskmanagement.domain.valueobjects.UserId;
+import mk.ukim.finki.emt.commentmanagement.domain.valueobjects.TaskId;
+import mk.ukim.finki.emt.commentmanagement.domain.valueobjects.User;
+import mk.ukim.finki.emt.commentmanagement.domain.valueobjects.UserId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -19,7 +17,6 @@ import java.util.List;
 
 @Service
 public class UserClient {
-
     private final RestTemplate restTemplate;
     private final String serverUrl;
 
@@ -76,63 +73,5 @@ public class UserClient {
             return null;
         }
 
-    }
-
-    public Boolean setTaskAssigned(TaskId taskId, UserId userId) {
-        try {
-            String path = "/api/setTaskAssigned";
-
-            URI uri = uri().path(path).queryParam("taskId", taskId).queryParam("userId", userId).
-                    build().toUri();
-
-            return restTemplate.exchange(uri, HttpMethod.POST, null,
-                    new ParameterizedTypeReference<Boolean>() {}).getBody();
-        } catch (Exception e) {
-            return false;
-        }
-
-    }
-
-    public Boolean setTaskOwned(TaskId taskId, UserId userId) {
-        try {
-            String path = "/api/setTaskOwned";
-
-            URI uri = uri().path(path).queryParam("taskId", taskId).queryParam("userId", userId).
-                    build().toUri();
-
-            return restTemplate.exchange(uri, HttpMethod.POST, null,
-                    new ParameterizedTypeReference<Boolean>() {}).getBody();
-        } catch (Exception e) {
-            return false;
-        }
-
-    }
-
-    public Boolean deleteTaskAssigned(UserId assignee) {
-        try {
-            String path = "/api/deleteTaskAssigned";
-
-            URI uri = uri().path(path).queryParam("userId", assignee).
-                    build().toUri();
-
-            return restTemplate.exchange(uri, HttpMethod.DELETE, null,
-                    new ParameterizedTypeReference<Boolean>() {}).getBody();
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public Boolean deleteTaskOwned(UserId creator) {
-        try {
-            String path = "/api/deleteTaskOwned";
-
-            URI uri = uri().path(path).queryParam("userId", creator).
-                    build().toUri();
-
-            return restTemplate.exchange(uri, HttpMethod.DELETE, null,
-                    new ParameterizedTypeReference<Boolean>() {}).getBody();
-        } catch (Exception e) {
-            return false;
-        }
     }
 }

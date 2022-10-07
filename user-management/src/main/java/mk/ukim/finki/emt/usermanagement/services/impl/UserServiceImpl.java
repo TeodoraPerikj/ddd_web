@@ -10,6 +10,7 @@ import mk.ukim.finki.emt.usermanagement.services.UserService;
 import mk.ukim.finki.emt.usermanagement.services.form.UserEditForm;
 import mk.ukim.finki.emt.usermanagement.services.form.UserLoginForm;
 import mk.ukim.finki.emt.usermanagement.services.form.UserRegisterForm;
+import mk.ukim.finki.emt.usermanagement.xport.client.TaskClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final TaskClient taskClient;
 
     @Override
     public Optional<User> login(UserLoginForm userLoginForm) {
@@ -83,10 +85,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void delete(UserId username) {
-        User user = userRepository.findById(username).orElseThrow(UserNotFoundException::new);
+    public boolean delete(UserId userId) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+        if(!this.taskClient.deleteTaskAssigned(user.getTaskAssigned()))
+            throw new CannotDeleteTaskAssigned(user.getId().getId(), user.getTaskAssigned().getId());
+
+        if(!this.taskClient.deleteTaskOwned(user.getTaskOwned()))
+            throw new CannotDeleteTaskOwned(user.getId().getId(), user.getTaskOwned().getId());
 
         userRepository.delete(user);
+
+        return true;
     }
 
     @Override
@@ -147,7 +157,11 @@ public class UserServiceImpl implements UserService {
         List<Task> allTasks = new ArrayList<>();
 
         for(Task task : tasks){
-            if(task.getId().equals(user.getTaskAssigned())){
+
+            String taskId = task.getId().getId();
+            String taskAssignedId = user.getTaskAssigned().getId();
+
+            if(taskId.equals(taskAssignedId)){
                 allTasks.add(task);
             }
         }
@@ -208,7 +222,11 @@ public class UserServiceImpl implements UserService {
         List<Task> allTasks = new ArrayList<>();
 
         for(Task task : tasks){
-            if(task.getId().equals(user.getTaskAssigned())){
+
+            String taskId = task.getId().getId();
+            String taskAssignedId = user.getTaskAssigned().getId();
+
+            if(taskId.equals(taskAssignedId)){
                 allTasks.add(task);
             }
         }
@@ -336,6 +354,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean deleteTaskAssigned(UserId userId) {
+        User user = this.userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+        user.changeTaskAssigned(null);
+
+        userRepository.saveAndFlush(user);
+
+        return true;
+    }
+
+    @Override
+    public boolean deleteTaskOwned(UserId userId) {
+        User user = this.userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+        user.changeTaskOwned(null);
+
+        userRepository.saveAndFlush(user);
+
+        return true;
+    }
+
+    @Override
     public MyUserTasksDto findTasksForTheUser(String username, List<Task> tasks) {
         List<Task> myToDoTasks;
         List<Task> myInProgressTasks;
@@ -354,10 +394,6 @@ public class UserServiceImpl implements UserService {
 
             String taskId = task.getId().getId();
             String taskOwned = user.getTaskOwned().getId();
-
-//            if(taskId.equals(taskOwned)){
-//                ownedTasks.add(task);
-//            }
 
             if(taskId.equals(taskOwned)){
                 ownedTasks.add(task);
@@ -388,7 +424,10 @@ public class UserServiceImpl implements UserService {
         List<Task> allTasks = new ArrayList<>();
 
         for(Task task : tasks){
-            if(task.getId().equals(user.getTaskAssigned())){
+            String taskId = task.getId().getId();
+            String taskAssignedId = user.getTaskAssigned().getId();
+
+            if(taskId.equals(taskAssignedId)){
                 allTasks.add(task);
             }
         }
@@ -434,7 +473,10 @@ public class UserServiceImpl implements UserService {
         //tasksByUser.add(taskAssigned);
 
         for(Task task : tasks){
-            if(task.getId().equals(user.getTaskAssigned())){
+            String taskId = task.getId().getId();
+            String taskAssignedId = user.getTaskAssigned().getId();
+
+            if(taskId.equals(taskAssignedId)){
                 tasksByUser.add(task);
             }
         }

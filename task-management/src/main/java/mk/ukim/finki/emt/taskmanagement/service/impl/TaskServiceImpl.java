@@ -9,6 +9,7 @@ import mk.ukim.finki.emt.taskmanagement.domain.valueobjects.*;
 import mk.ukim.finki.emt.taskmanagement.service.TaskService;
 import mk.ukim.finki.emt.taskmanagement.service.form.TaskCreateForm;
 import mk.ukim.finki.emt.taskmanagement.service.form.TaskEditForm;
+import mk.ukim.finki.emt.taskmanagement.xport.client.CommentClient;
 import mk.ukim.finki.emt.taskmanagement.xport.client.UserClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,7 @@ public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
     private final UserClient userClient;
+    private final CommentClient commentClient;
 
     @Override
     public Optional<Task> create(TaskCreateForm taskForm) {
@@ -91,10 +93,21 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public void delete(TaskId id) {
+    public boolean delete(TaskId id) {
         Task task = taskRepository.findById(id).orElseThrow(TaskNotFoundException::new);
 
+        if(!this.userClient.deleteTaskAssigned(task.getAssignee()))
+            throw new CannotDeleteAssignedTask(task.getAssignee().getId(), task.getId().toString());
+
+        if(!this.userClient.deleteTaskOwned(task.getCreator()))
+            throw new CannotDeleteOwnedTask(task.getCreator().getId(), task.getId().toString());
+
+        if(!this.commentClient.deleteComment(task.getComment()))
+            throw new CannotDeleteComment(task.getComment().getId(), task.getId().toString());
+
         taskRepository.delete(task);
+
+        return true;
     }
 
     @Override
@@ -123,11 +136,16 @@ public class TaskServiceImpl implements TaskService {
 
             //TODO: Find by Username and then by Id
 
-            CommentId commentId = task.getComment();
+            String comment;
+            if(task.getComment() == null){
+                comment = "No Comments";
+            } else {
+                comment = this.commentClient.findById(task.getComment()).getComment();
+            }
 
             EachTaskDto eachTaskDto = new EachTaskDto(task.getId().toString(), task.getTitle(), task.getDescription(),
                     task.getStartDate(), task.getDueDate(), task.getEstimationDays(), task.getStatus(),
-                    assignee.getUsername(), creator.getUsername(), commentId.toString());
+                    assignee.getUsername(), creator.getUsername(), comment);
 
             eachTaskDtos.add(eachTaskDto);
         }
@@ -135,16 +153,22 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Optional<TaskInfoDto> showTaskInfo(TaskId taskId, String userId) {
+    public Optional<TaskInfoDto> showTaskInfo(TaskId taskId, String activeUser) {
         Task task = null;
 
         if(this.findById(taskId).isPresent())
             task = this.findById(taskId).get();
 
-        String textAndType = this.filter(task, userId);
-        UserId assignee = task.getAssignee();
+        assert task != null;
 
-        TaskInfoDto taskInfoDto = new TaskInfoDto(task, textAndType, assignee.getId());
+        User active = this.userClient.findByUsername(activeUser);
+
+        String textAndType = this.filter(task, active.getId().getId());
+        //UserId assignee = task.getAssignee();
+
+        User assignedUser = this.userClient.findById(task.getAssignee());
+
+        TaskInfoDto taskInfoDto = new TaskInfoDto(task, textAndType, assignedUser.getUsername());
 
         return Optional.of(taskInfoDto);
     }
@@ -195,11 +219,35 @@ public class TaskServiceImpl implements TaskService {
                 task = this.changeStatus(taskId, TaskStatus.InProgress).get();
         }
 
-        UserId assignee = task.getAssignee();
+        UserId assigneeId = task.getAssignee();
 
-        CommentId commentId = task.getComment();
+        User user = this.userClient.findById(assigneeId);
 
-        WorkOnTaskDto workOnTaskDto = new WorkOnTaskDto(task, assignee.getId(), commentId.getId());
+        String comment;
+        LocalDateTime dateTime;
+        String commentUser;
+        String commentId;
+
+        if(task.getComment() == null){
+            comment = "No Comments";
+            dateTime = LocalDateTime.now();
+            commentUser = "No User";
+            commentId = "No Comment Id";
+        } else {
+            Comment taskComment = this.commentClient.findById(task.getComment());
+            comment = taskComment.getComment();
+            dateTime = taskComment.getDateTime();
+
+            User userFromComment = this.userClient.findById(taskComment.getUserId());
+
+            commentUser = userFromComment.getUsername();
+            commentId = taskComment.getId().getId();
+        }
+
+        //CommentId commentId = task.getComment();
+
+        WorkOnTaskDto workOnTaskDto = new WorkOnTaskDto(task, user.getUsername(), comment,
+                dateTime, commentUser, commentId);
 
         return Optional.of(workOnTaskDto);
     }
@@ -212,5 +260,39 @@ public class TaskServiceImpl implements TaskService {
         task.changeStatus(status);
 
         return Optional.of(this.taskRepository.save(task));
+    }
+
+    @Override
+    public Boolean setComment(TaskId taskId, CommentId commentId) {
+
+        Task task = this.taskRepository.findById(taskId).orElseThrow(TaskNotFoundException::new);
+
+        task.changeComment(commentId);
+
+        taskRepository.saveAndFlush(task);
+
+        return true;
+    }
+
+    @Override
+    public Boolean deleteComment(TaskId taskId) {
+        Task task = this.taskRepository.findById(taskId).orElseThrow(TaskNotFoundException::new);
+
+        task.changeComment(null);
+
+        taskRepository.saveAndFlush(task);
+
+        return true;
+    }
+
+    @Override
+    public Boolean deleteTaskAssigned(TaskId taskId) {
+        Task task = this.taskRepository.findById(taskId).orElseThrow(TaskNotFoundException::new);
+
+        task.changeAssignee(null);
+
+        taskRepository.saveAndFlush(task);
+
+        return true;
     }
 }

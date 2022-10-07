@@ -19,7 +19,7 @@ public interface UserService {
 
     User  edit(UserEditForm userEditForm) throws UserNotFoundException;
 
-    void delete(UserId username) throws UserNotFoundException;
+    boolean delete(UserId userId) throws UserNotFoundException;
 
     //List<Task> listTasksByStatus(UserId username, TaskStatus status, List<Task> tasks);
 
@@ -49,4 +49,8 @@ public interface UserService {
     boolean setTaskAssigned(TaskId taskId, UserId userId);
 
     boolean setTaskOwned(TaskId taskId, UserId userId);
+
+    boolean deleteTaskAssigned(UserId userId);
+
+    boolean deleteTaskOwned(UserId userId);
 }

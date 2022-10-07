@@ -16,11 +16,12 @@ public class TaskInfoResource {
     private final TaskService taskService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<TaskInfoDto> showTaskInfo2(@PathVariable String id, @RequestParam String username){
+    public ResponseEntity<TaskInfoDto> showTaskInfo2(@PathVariable String id,
+                                                     @RequestParam("username") String activeUser){
 
         TaskId taskId = new TaskId(id);
 
-        return this.taskService.showTaskInfo(taskId, username)
+        return this.taskService.showTaskInfo(taskId, activeUser)
                 .map(taskInfoDto -> ResponseEntity.ok().body(taskInfoDto))
                 .orElseGet(() -> ResponseEntity.notFound().build());
 
