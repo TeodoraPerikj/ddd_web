@@ -10,6 +10,7 @@ import mk.ukim.finki.emt.commentmanagement.domain.repository.CommentRepository;
 import mk.ukim.finki.emt.commentmanagement.domain.valueobjects.CommentsDto;
 import mk.ukim.finki.emt.commentmanagement.domain.valueobjects.Task;
 import mk.ukim.finki.emt.commentmanagement.domain.valueobjects.TaskId;
+import mk.ukim.finki.emt.commentmanagement.domain.valueobjects.UserId;
 import mk.ukim.finki.emt.commentmanagement.service.CommentService;
 import mk.ukim.finki.emt.commentmanagement.service.form.CommentForm;
 import mk.ukim.finki.emt.commentmanagement.xport.client.TaskClient;
@@ -94,5 +95,18 @@ public class CommentServiceImpl implements CommentService {
         }
 
         return commentsDtos;
+    }
+
+    @Override
+    public boolean deleteComments(UserId userId) {
+
+        for(Comment comment : this.commentRepository.findAll()){
+
+            if(comment.getUserId().getId().equals(userId.getId())){
+                comment.editUser(null);
+                this.commentRepository.saveAndFlush(comment);
+            }
+        }
+        return true;
     }
 }

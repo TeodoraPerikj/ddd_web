@@ -1,6 +1,7 @@
 package mk.ukim.finki.emt.commentmanagement.xport.rest;
 
 import lombok.AllArgsConstructor;
+import mk.ukim.finki.emt.commentmanagement.domain.exceptions.CommentNotFoundException;
 import mk.ukim.finki.emt.commentmanagement.domain.model.Comment;
 import mk.ukim.finki.emt.commentmanagement.domain.model.CommentId;
 import mk.ukim.finki.emt.commentmanagement.domain.valueobjects.*;
@@ -30,11 +31,14 @@ public class CommentsResource {
     public ResponseEntity deleteComment2(@PathVariable String id){
 
         CommentId commentId = new CommentId(id);
-        this.commentService.delete(commentId);
 
-        if(this.commentService.findById(commentId).isPresent())
-            return ResponseEntity.badRequest().build();
-        return ResponseEntity.ok().build();
+       try{
+           this.commentService.delete(commentId);
+           return ResponseEntity.ok().build();
+       }
+       catch (CommentNotFoundException exception){
+           return ResponseEntity.badRequest().build();
+       }
     }
 
     @PostMapping("/{id}/leaveComment")
@@ -67,9 +71,21 @@ public class CommentsResource {
     }
 
     @DeleteMapping("/delete")
-    public Boolean deleteComment(@RequestParam CommentId commentId){
+    public Boolean deleteComment(@RequestParam(required = false) CommentId commentId){
 
+        if(commentId.getId().equals(""))
+            return true;
         if(this.commentService.delete(commentId))
+            return true;
+
+        return false;
+    }
+
+    @DeleteMapping("/deleteComments")
+    public Boolean deleteComments(@RequestParam UserId userId){
+
+
+        if(this.commentService.deleteComments(userId))
             return true;
 
         return false;

@@ -21,20 +21,26 @@ public class UsersDto implements ValueObject {
     @JsonProperty("username")
     private final String username;
 
+    @JsonProperty("role")
+    private final String role;
+
     private UsersDto(){
         this.name = "";
         this.surname = "";
         //this.username = UserId.randomId(UserId.class);
         this.username = "";
+        this.role = "";
     }
 
     @JsonCreator
     public UsersDto(@JsonProperty("name") String name,
                     @JsonProperty("surname") String surname,
-                    @JsonProperty("username") String username){
+                    @JsonProperty("username") String username,
+                    @JsonProperty("role") String role){
                     //UserId username) {
         this.name = name;
         this.surname = surname;
         this.username = username;
+        this.role = role;
     }
 }

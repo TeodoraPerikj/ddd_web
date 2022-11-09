@@ -3,6 +3,7 @@ package mk.ukim.finki.emt.usermanagement.domain.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import mk.ukim.finki.emt.sharedkernel.domain.base.AbstractEntity;
+import mk.ukim.finki.emt.usermanagement.domain.valueobjects.Role;
 import mk.ukim.finki.emt.usermanagement.domain.valueobjects.Task;
 import mk.ukim.finki.emt.usermanagement.domain.valueobjects.TaskId;
 
@@ -31,6 +32,10 @@ public class User extends AbstractEntity<UserId> {
     @JsonProperty("taskOwned")
     private TaskId taskOwned;
 
+    @JsonProperty("role")
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     public User(){
         super(UserId.randomId(UserId.class));
     }
@@ -46,6 +51,12 @@ public class User extends AbstractEntity<UserId> {
         user.surname = surname;
         user.username = username;
         user.password = password;
+
+        if(username.contains("admin")){
+            user.role = Role.ROLE_ADMIN;
+        }else {
+            user.role = Role.ROLE_USER;
+        }
 
         return user;
     }
@@ -84,5 +95,9 @@ public class User extends AbstractEntity<UserId> {
 
     public void changeTaskOwned(TaskId taskOwned){
         this.taskOwned = taskOwned;
+    }
+
+    public void changeRole(Role role){
+        this.role = role;
     }
 }

@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import mk.ukim.finki.emt.sharedkernel.domain.base.ValueObject;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+
 @Getter
 public class User implements ValueObject {
 
@@ -23,12 +26,17 @@ public class User implements ValueObject {
     @JsonProperty("password")
     private final String password;
 
+    @JsonProperty("role")
+    @Enumerated(EnumType.STRING)
+    private final Role role;
+
     public User() {
         this.id = UserId.randomId(UserId.class);
         this.name = "";
         this.surname = "";
         this.username = "";
         this.password = "";
+        this.role = Role.ROLE_USER;
     }
 
     @JsonCreator
@@ -36,11 +44,13 @@ public class User implements ValueObject {
             //@JsonProperty("id") UserId id,
                 @JsonProperty("name") String name,
                 @JsonProperty("surname") String surname,
-                @JsonProperty("password") String password) {
+                @JsonProperty("password") String password,
+                @JsonProperty("role") Role role) {
         this.id = UserId.randomId(UserId.class);
         this.name = name;
         this.surname = surname;
         this.username = username;
         this.password = password;
+        this.role = role;
     }
 }

@@ -4,6 +4,7 @@ import mk.ukim.finki.emt.commentmanagement.domain.model.Comment;
 import mk.ukim.finki.emt.commentmanagement.domain.model.CommentId;
 import mk.ukim.finki.emt.commentmanagement.domain.valueobjects.CommentsDto;
 import mk.ukim.finki.emt.commentmanagement.domain.valueobjects.TaskId;
+import mk.ukim.finki.emt.commentmanagement.domain.valueobjects.UserId;
 import mk.ukim.finki.emt.commentmanagement.service.form.CommentForm;
 
 import java.util.List;
@@ -23,4 +24,5 @@ public interface CommentService {
 
     List<CommentsDto> showCommentsDto();
 
+    boolean deleteComments(UserId userId);
 }

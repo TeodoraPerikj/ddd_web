@@ -944,6 +944,7 @@ false Zulu
     <language id="34" parent="7" name="sql"/>
     <table id="35" parent="22" name="app_user">
       <ObjectId>16512</ObjectId>
+      <Outdated>1</Outdated>
       <Owner>postgres</Owner>
       <StateNumber>1208</StateNumber>
     </table>

@@ -1,6 +1,9 @@
 package mk.ukim.finki.emt.usermanagement.xport.rest;
 
 import lombok.AllArgsConstructor;
+import mk.ukim.finki.emt.usermanagement.domain.exceptions.InvalidArgumentsException;
+import mk.ukim.finki.emt.usermanagement.domain.exceptions.PasswordsDoNotMatchException;
+import mk.ukim.finki.emt.usermanagement.domain.exceptions.UsernameAlreadyExistsException;
 import mk.ukim.finki.emt.usermanagement.domain.model.User;
 import mk.ukim.finki.emt.usermanagement.domain.model.UserId;
 import mk.ukim.finki.emt.usermanagement.domain.valueobjects.Task;
@@ -12,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
@@ -31,6 +35,11 @@ public class UserResource {
         return this.userService.showUsersDto();
     }
 
+    @GetMapping("/notAssignedUsers")
+    public List<UsersDto> notAssignedUsers(){
+        return this.userService.getNotAssignedUsers();
+    }
+
     @GetMapping("/findByUsername")
     public User findByUsername(@RequestParam("username") String username){
         return this.userService.findByUsername(username);
@@ -44,9 +53,17 @@ public class UserResource {
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody UserRegisterForm userRegisterForm) {
 
-        return this.userService.register(userRegisterForm)
-                .map(user -> ResponseEntity.ok().body(user))
-                .orElseGet(() -> ResponseEntity.badRequest().build());
+        Optional<User> user;
+        try {
+            user = this.userService.register(userRegisterForm);
+        }catch (PasswordsDoNotMatchException exception){
+            return ResponseEntity.badRequest().build();
+        }catch (UsernameAlreadyExistsException exception){
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.of(user);
+
     }
 
     @PostMapping("/setTaskAssigned")
@@ -85,5 +102,10 @@ public class UserResource {
             return true;
 
         return false;
+    }
+
+    @PostMapping("/changeRole")
+    public User changeRole(@RequestParam String username, @RequestParam String role){
+        return this.userService.changeRole(username, role);
     }
 }

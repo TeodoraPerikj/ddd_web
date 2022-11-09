@@ -4,6 +4,7 @@ import mk.ukim.finki.emt.taskmanagement.domain.model.Task;
 import mk.ukim.finki.emt.taskmanagement.domain.model.TaskId;
 import mk.ukim.finki.emt.taskmanagement.domain.valueobjects.User;
 import mk.ukim.finki.emt.taskmanagement.domain.valueobjects.UserId;
+import mk.ukim.finki.emt.taskmanagement.domain.valueobjects.UserLoginReturnedDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -70,6 +71,22 @@ public class UserClient {
 
             User user = restTemplate.exchange(uri, HttpMethod.GET, null,
                     new ParameterizedTypeReference<User>() {}).getBody();
+
+            return user;
+        } catch (Exception e) {
+            return null;
+        }
+
+    }
+
+    public UserLoginReturnedDto getActiveUser() {
+        try {
+            String path = "/api/login";
+
+            URI uri = uri().path(path).build().toUri();
+
+            UserLoginReturnedDto user = restTemplate.exchange(uri, HttpMethod.GET, null,
+                    new ParameterizedTypeReference<UserLoginReturnedDto>() {}).getBody();
 
             return user;
         } catch (Exception e) {

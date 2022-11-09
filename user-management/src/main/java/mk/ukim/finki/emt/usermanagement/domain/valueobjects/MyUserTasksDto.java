@@ -29,6 +29,12 @@ public class MyUserTasksDto implements ValueObject {
     @JsonProperty("numberOfTasks")
     private final List<Integer> numberOfTasks;
 
+    @JsonProperty("activeUser")
+    private final String activeUser;
+
+    @JsonProperty("role")
+    private final String role;
+
     private MyUserTasksDto(){
         this.myToDoTasks = new ArrayList<>();
         this.myInProgressTasks = new ArrayList<>();
@@ -36,6 +42,8 @@ public class MyUserTasksDto implements ValueObject {
         this.myCanceledTasks = new ArrayList<>();
         this.ownedTasks = new ArrayList<>();
         this.numberOfTasks = new ArrayList<>();
+        this.activeUser = "";
+        this.role = "";
     }
 
     @JsonCreator
@@ -44,13 +52,17 @@ public class MyUserTasksDto implements ValueObject {
                           @JsonProperty("myDoneTasks") List<Task> myDoneTasks,
                           @JsonProperty("myCanceledTasks") List<Task> myCanceledTasks,
                           @JsonProperty("ownedTasks") List<Task> ownedTasks,
-                          @JsonProperty("numberOfTasks") List<Integer> numberOfTasks){
+                          @JsonProperty("numberOfTasks") List<Integer> numberOfTasks,
+                          @JsonProperty("activeUser") String activeUser,
+                          @JsonProperty("role") String role){
         this.myToDoTasks = myToDoTasks;
         this.myInProgressTasks = myInProgressTasks;
         this.myDoneTasks = myDoneTasks;
         this.myCanceledTasks = myCanceledTasks;
         this.ownedTasks = ownedTasks;
         this.numberOfTasks = numberOfTasks;
+        this.activeUser = activeUser;
+        this.role = role;
     }
 }
 

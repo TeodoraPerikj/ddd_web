@@ -35,6 +35,15 @@ public class WorkOnTaskDto implements ValueObject {
     @JsonProperty("commentId")
     private final String commentId;
 
+    @JsonProperty("creator")
+    private final String creator;
+
+    @JsonProperty("activeUser")
+    private final String activeUser;
+
+    @JsonProperty("role")
+    private final String role;
+
     private WorkOnTaskDto() {
         this.task = new Task();
 //        this.assignee = UserId.randomId(UserId.class);
@@ -44,6 +53,9 @@ public class WorkOnTaskDto implements ValueObject {
         this.dateTime = LocalDateTime.now();
         this.commentUser = "";
         this.commentId = "";
+        this.creator = "";
+        this.activeUser = "";
+        this.role = "";
     }
 
     @JsonCreator
@@ -54,12 +66,18 @@ public class WorkOnTaskDto implements ValueObject {
                          @JsonProperty("comment") String comment,
                          @JsonProperty("dateTime") LocalDateTime dateTime,
                          @JsonProperty("commentUser") String commentUser,
-                         @JsonProperty("commentId") String commentId) {
+                         @JsonProperty("commentId") String commentId,
+                         @JsonProperty("creator") String creator,
+                         @JsonProperty("activeUser") String activeUser,
+                         @JsonProperty("role") String role) {
         this.task = task;
         this.assignee = assignee;
         this.comment = comment;
         this.dateTime = dateTime;
         this.commentUser = commentUser;
         this.commentId = commentId;
+        this.creator = creator;
+        this.activeUser = activeUser;
+        this.role = role;
     }
 }

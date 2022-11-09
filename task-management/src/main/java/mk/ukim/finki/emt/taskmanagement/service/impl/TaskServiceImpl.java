@@ -46,8 +46,6 @@ public class TaskServiceImpl implements TaskService {
 
         if(localStartDate.isAfter(localDueDate))
             throw new LocalDateTimeException();
-        
-        //TODO: POST to User Management Application to set TaskId Assigned and TaskId Owned
 
         Task task = Task.build(taskForm.getTitle(), taskForm.getDescription(), localStartDate,
                 localDueDate, taskForm.getEstimationDays(), taskForm.getCreator(), taskForm.getAssignee());
@@ -87,7 +85,10 @@ public class TaskServiceImpl implements TaskService {
         }
 
         task.changeEstimationDays(taskForm.getEstimationDays());
+
+        this.userClient.deleteTaskAssigned(task.getAssignee());
         task.changeAssignee(taskForm.getAssignee());
+        this.userClient.setTaskAssigned(id, taskForm.getAssignee());
 
         return Optional.of(taskRepository.saveAndFlush(task));
     }
@@ -188,13 +189,13 @@ public class TaskServiceImpl implements TaskService {
 
             if(task.getStatus().equals(TaskStatus.TODO)){
 
-                if (task.getAssignee().getId().equals(username))
+                if (task.getAssignee().getId().equals(username) || task.getCreator().getId().equals(username))
                     return "Start Task";
 
                 return "Join Task";
             } else if(task.getStatus().equals(TaskStatus.InProgress)) {
 
-                if (task.getAssignee().getId().equals(username))
+                if (task.getAssignee().getId().equals(username) || task.getCreator().getId().equals(username))
                     return "Continue Task";
 
                 return "Join Task";
@@ -214,11 +215,7 @@ public class TaskServiceImpl implements TaskService {
         if(this.findById(taskId).isPresent())
             task =this.findById(taskId).get();
 
-        if(task.getStatus().equals(TaskStatus.TODO)){
-            if(this.changeStatus(taskId, TaskStatus.InProgress).isPresent())
-                task = this.changeStatus(taskId, TaskStatus.InProgress).get();
-        }
-
+        assert task != null;
         UserId assigneeId = task.getAssignee();
 
         User user = this.userClient.findById(assigneeId);
@@ -246,8 +243,21 @@ public class TaskServiceImpl implements TaskService {
 
         //CommentId commentId = task.getComment();
 
+        String creator  = this.userClient.findById(task.getCreator()).getUsername();
+        UserLoginReturnedDto activeUser = this.userClient.getActiveUser();
+
+        if(task.getStatus().equals(TaskStatus.TODO)){
+
+            if(activeUser.getUsername().equals(creator) ||
+                    activeUser.getUsername().equals(user.getUsername())) {
+
+                if(this.changeStatus(taskId, TaskStatus.InProgress).isPresent())
+                    task = this.changeStatus(taskId, TaskStatus.InProgress).get();
+            }
+        }
+
         WorkOnTaskDto workOnTaskDto = new WorkOnTaskDto(task, user.getUsername(), comment,
-                dateTime, commentUser, commentId);
+                dateTime, commentUser, commentId, creator, activeUser.getUsername(), activeUser.getRole());
 
         return Optional.of(workOnTaskDto);
     }

@@ -1,6 +1,9 @@
 package mk.ukim.finki.emt.taskmanagement.xport.rest;
 
 import lombok.AllArgsConstructor;
+import mk.ukim.finki.emt.taskmanagement.domain.exceptions.EstimationDaysGreaterThanDaysToWorkOnTaskException;
+import mk.ukim.finki.emt.taskmanagement.domain.exceptions.LocalDateTimeException;
+import mk.ukim.finki.emt.taskmanagement.domain.exceptions.TaskNotFoundException;
 import mk.ukim.finki.emt.taskmanagement.domain.model.Task;
 import mk.ukim.finki.emt.taskmanagement.domain.model.TaskId;
 import mk.ukim.finki.emt.taskmanagement.domain.valueobjects.*;
@@ -30,13 +33,30 @@ public class TasksResource {
     }
 
     @GetMapping("/api/tasks/edit-task/{id}")
-    public ResponseEntity<Task> getEditTaskPage2(@PathVariable String id){
+    public ResponseEntity<TaskAndActiveUserDto> getEditTaskPage2(@PathVariable String id){
 
         TaskId taskId = new TaskId(id);
 
         Optional<Task> task = this.taskService.findById(taskId);
 
-        return task.map(taskById -> ResponseEntity.ok().body(taskById))
+        Task foundTask = null;
+
+        if(task.isPresent())
+            foundTask = task.get();
+
+        UserLoginReturnedDto activeUser = this.userClient.getActiveUser();
+
+        User creatorUsername = this.userClient.findById(foundTask.getCreator());
+
+        User assignee = this.userClient.findById(foundTask.getAssignee());
+
+        Optional<TaskAndActiveUserDto> taskAndActiveUserDto =
+                Optional.of(new TaskAndActiveUserDto(foundTask.getTitle(), foundTask.getDescription(),
+                        foundTask.getStartDate().toString(), foundTask.getDueDate().toString(),
+                        foundTask.getEstimationDays().toString(), assignee.getUsername(),
+                        creatorUsername.getUsername(), activeUser.getUsername()));
+
+        return taskAndActiveUserDto.map(taskById -> ResponseEntity.ok().body(taskById))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -67,9 +87,21 @@ public class TasksResource {
         taskCreateForm.setCreator(creatorId);
         taskCreateForm.setAssignee(assigneeId);
 
-        return this.taskService.create(taskCreateForm)
-                .map(task -> ResponseEntity.ok().body(task))
-                .orElseGet(() -> ResponseEntity.badRequest().build());
+        Optional<Task> task;
+        try {
+            task = this.taskService.create(taskCreateForm);
+        }catch (EstimationDaysGreaterThanDaysToWorkOnTaskException exception){
+            return ResponseEntity.badRequest().build();
+        }catch (LocalDateTimeException exception){
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.of(task);
+
+
+//        return this.taskService.create(taskCreateForm)
+//                .map(task -> ResponseEntity.ok().body(task))
+//                .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
     @PutMapping("/api/tasks/add/{id}")
@@ -79,8 +111,6 @@ public class TasksResource {
         TaskId taskId = new TaskId(id);
 
         if(taskDto.getAssignee() != null) {
-            //TODO
-            //userId = this.userService.findAssignedUsers(taskDto.getAssignee());
             User assignee = this.userClient.findByUsername(taskDto.getAssignee());
             userId = assignee.getId();
         }
@@ -108,9 +138,20 @@ public class TasksResource {
         taskEditForm.setEstimationDays(days);
         taskEditForm.setAssignee(userId);
 
-        return this.taskService.edit(taskId, taskEditForm)
-                .map(task -> ResponseEntity.ok().body(task))
-                .orElseGet(() -> ResponseEntity.badRequest().build());
+        Optional<Task> task;
+        try {
+            task = this.taskService.edit(taskId, taskEditForm);
+        }catch (EstimationDaysGreaterThanDaysToWorkOnTaskException exception){
+            return ResponseEntity.badRequest().build();
+        }catch (LocalDateTimeException exception){
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.of(task);
+//
+//        return this.taskService.edit(taskId, taskEditForm)
+//                .map(task -> ResponseEntity.ok().body(task))
+//                .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
     @DeleteMapping("/api/tasks/delete/{id}")
@@ -118,12 +159,12 @@ public class TasksResource {
 
         TaskId taskId = new TaskId(id);
 
-        this.taskService.delete(taskId);
-
-        if(this.taskService.findById(taskId).isPresent())
+        try {
+            this.taskService.delete(taskId);
+            return ResponseEntity.ok().build();
+        }catch (TaskNotFoundException exception){
             return ResponseEntity.badRequest().build();
-
-        return ResponseEntity.ok().build();
+        }
     }
 
     @GetMapping("/api/findById")
@@ -147,14 +188,18 @@ public class TasksResource {
     }
 
     @DeleteMapping("/api/deleteTaskAssigned")
-    public Boolean deleteTaskAssigned(@RequestParam TaskId taskId){
+    public Boolean deleteTaskAssigned(@RequestParam(required = false) TaskId taskId){
 
+        if(taskId.getId().equals(""))
+            return true;
         return this.taskService.deleteTaskAssigned(taskId);
     }
 
     @DeleteMapping("/api/deleteTaskOwned")
-    public Boolean deleteTaskOwned(@RequestParam TaskId taskId){
+    public Boolean deleteTaskOwned(@RequestParam(required = false) TaskId taskId){
 
+        if(taskId.getId().equals(""))
+            return true;
         return this.taskService.delete(taskId);
     }
 }

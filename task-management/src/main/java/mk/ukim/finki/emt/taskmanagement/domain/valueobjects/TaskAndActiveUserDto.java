@@ -6,7 +6,7 @@ import lombok.Getter;
 import mk.ukim.finki.emt.sharedkernel.domain.base.ValueObject;
 
 @Getter
-public class TaskDto implements ValueObject {
+public class TaskAndActiveUserDto implements ValueObject {
     @JsonProperty("title")
     private final String title;
 
@@ -34,9 +34,10 @@ public class TaskDto implements ValueObject {
     @JsonProperty("creator")
     private final String creator;
 
-    //// MAKE THEM STRING IF NEEDED
+    @JsonProperty("activeUser")
+    private final String activeUser;
 
-    private TaskDto() {
+    private TaskAndActiveUserDto() {
         this.title = "";
         this.description = "";
         this.startDate = "";
@@ -46,17 +47,19 @@ public class TaskDto implements ValueObject {
 //        this.creator = UserId.randomId(UserId.class);
         this.assignee = "";
         this.creator = "";
+        this.activeUser = "";
     }
     @JsonCreator
-    public TaskDto(@JsonProperty("title") String title,
-                   @JsonProperty("description") String description,
-                   @JsonProperty("startDate") String startDate,
-                   @JsonProperty("dueDate") String dueDate,
-                   @JsonProperty("estimationDays") String estimationDays,
+    public TaskAndActiveUserDto(@JsonProperty("title") String title,
+                                @JsonProperty("description") String description,
+                                @JsonProperty("startDate") String startDate,
+                                @JsonProperty("dueDate") String dueDate,
+                                @JsonProperty("estimationDays") String estimationDays,
 //                   @JsonProperty("assignee") UserId assignee,
 //                   @JsonProperty("creator") UserId creator){
-                   @JsonProperty("assignee") String assignee,
-                   @JsonProperty("creator") String creator){
+                                @JsonProperty("assignee") String assignee,
+                                @JsonProperty("creator") String creator,
+                                @JsonProperty("activeUser") String activeUser) {
         this.title = title;
         this.description = description;
         this.startDate = startDate;
@@ -64,5 +67,6 @@ public class TaskDto implements ValueObject {
         this.estimationDays = estimationDays;
         this.assignee = assignee;
         this.creator = creator;
+        this.activeUser = activeUser;
     }
 }

@@ -12,10 +12,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
-    Optional<User> login(UserLoginForm userLoginForm) throws InvalidArgumentsException, InvalidUserCredentialsException;
+    Optional<UserLoginReturnedDto> login(UserLoginForm userLoginForm) throws InvalidArgumentsException, InvalidUserCredentialsException;
 
     Optional<User>  register(UserRegisterForm userRegisterForm) throws InvalidArgumentsException, PasswordsDoNotMatchException,
             UsernameAlreadyExistsException;
+
+    boolean logoutUser();
 
     User  edit(UserEditForm userEditForm) throws UserNotFoundException;
 
@@ -44,6 +46,8 @@ public interface UserService {
 
     List<UsersDto> showUsersDto();
 
+    List<UsersDto> getNotAssignedUsers();
+
     User findById(UserId userId);
 
     boolean setTaskAssigned(TaskId taskId, UserId userId);
@@ -53,4 +57,8 @@ public interface UserService {
     boolean deleteTaskAssigned(UserId userId);
 
     boolean deleteTaskOwned(UserId userId);
+
+    Optional<UserLoginReturnedDto> getLoggedUser();
+
+    User changeRole(String username, String role);
 }

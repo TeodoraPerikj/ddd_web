@@ -10,6 +10,7 @@ import mk.ukim.finki.emt.usermanagement.services.UserService;
 import mk.ukim.finki.emt.usermanagement.services.form.UserEditForm;
 import mk.ukim.finki.emt.usermanagement.services.form.UserLoginForm;
 import mk.ukim.finki.emt.usermanagement.services.form.UserRegisterForm;
+import mk.ukim.finki.emt.usermanagement.xport.client.CommentClient;
 import mk.ukim.finki.emt.usermanagement.xport.client.TaskClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,14 +25,22 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-@AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final TaskClient taskClient;
+    private final CommentClient commentClient;
+    private User loggedUser;
+
+    public UserServiceImpl(UserRepository userRepository, TaskClient taskClient, CommentClient commentClient){
+        this.userRepository = userRepository;
+        this.taskClient = taskClient;
+        this.commentClient = commentClient;
+        this.loggedUser = new User();
+    }
 
     @Override
-    public Optional<User> login(UserLoginForm userLoginForm) {
+    public Optional<UserLoginReturnedDto> login(UserLoginForm userLoginForm) {
 
         Objects.requireNonNull(userLoginForm, "user login must not be null!");
 
@@ -43,7 +52,19 @@ public class UserServiceImpl implements UserService {
 
         userRepository.saveAndFlush(user.get());
 
-        return Optional.of(user.orElseThrow(InvalidUserCredentialsException::new));
+        this.setLoggedUser(user.get());
+
+        boolean ownedTask = user.get().getTaskOwned() != null ? true : false;
+
+        UserLoginReturnedDto userLoginReturnedDto = new UserLoginReturnedDto(user.get().getUsername(),
+                user.get().getId().getId(), user.get().getRole().toString(), ownedTask);
+
+//        return Optional.of(user.orElseThrow(InvalidUserCredentialsException::new));
+        return Optional.of(userLoginReturnedDto);
+    }
+
+    private void setLoggedUser(User user) {
+        loggedUser = user;
     }
 
     @Override
@@ -66,6 +87,12 @@ public class UserServiceImpl implements UserService {
         userRepository.saveAndFlush(user);
 
         return Optional.of(user);
+    }
+
+    @Override
+    public boolean logoutUser() {
+        loggedUser = new User();
+        return true;
     }
 
     @Override
@@ -93,6 +120,9 @@ public class UserServiceImpl implements UserService {
 
         if(!this.taskClient.deleteTaskOwned(user.getTaskOwned()))
             throw new CannotDeleteTaskOwned(user.getId().getId(), user.getTaskOwned().getId());
+
+        if(!this.commentClient.deleteComments(userId))
+            throw new CannotDeleteComments(user.getId().getId());
 
         userRepository.delete(user);
 
@@ -156,13 +186,15 @@ public class UserServiceImpl implements UserService {
 
         List<Task> allTasks = new ArrayList<>();
 
-        for(Task task : tasks){
+        if(user.getTaskAssigned() != null) {
+            for (Task task : tasks) {
 
-            String taskId = task.getId().getId();
-            String taskAssignedId = user.getTaskAssigned().getId();
+                String taskId = task.getId().getId();
+                String taskAssignedId = user.getTaskAssigned().getId();
 
-            if(taskId.equals(taskAssignedId)){
-                allTasks.add(task);
+                if (taskId.equals(taskAssignedId)) {
+                    allTasks.add(task);
+                }
             }
         }
 
@@ -221,13 +253,19 @@ public class UserServiceImpl implements UserService {
 
         List<Task> allTasks = new ArrayList<>();
 
-        for(Task task : tasks){
+        if(user.getTaskAssigned() != null) {
 
-            String taskId = task.getId().getId();
-            String taskAssignedId = user.getTaskAssigned().getId();
+            for (Task task : tasks) {
 
-            if(taskId.equals(taskAssignedId)){
-                allTasks.add(task);
+                String taskId = task.getId().getId();
+                String taskAssignedId = user.getTaskAssigned().getId();
+                String taskOwnedId = user.getTaskOwned().getId();
+
+                if (taskId.equals(taskAssignedId)) {
+                    allTasks.add(task);
+                }else if(taskId.equals(taskOwnedId) && !allTasks.contains(task)){
+                    allTasks.add(task);
+                }
             }
         }
 
@@ -319,7 +357,22 @@ public class UserServiceImpl implements UserService {
         List<UsersDto> usersDtos = new ArrayList<>();
 
         for(User user:this.userRepository.findAll()){
-            usersDtos.add(new UsersDto(user.getName(), user.getSurname(), user.getUsername()));
+            usersDtos.add(new UsersDto(user.getName(), user.getSurname(),
+                    user.getUsername(), user.getRole().toString()));
+        }
+
+        return usersDtos;
+    }
+
+    @Override
+    public List<UsersDto> getNotAssignedUsers() {
+        List<UsersDto> usersDtos = new ArrayList<>();
+
+        for(User user:this.userRepository.findAll()){
+
+            if(user.getTaskAssigned() == null)
+                usersDtos.add(new UsersDto(user.getName(), user.getSurname(),
+                        user.getUsername(), user.getRole().toString()));
         }
 
         return usersDtos;
@@ -376,6 +429,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Optional<UserLoginReturnedDto> getLoggedUser() {
+
+        boolean ownedTask = loggedUser.getTaskOwned() != null? true : false;
+
+        UserLoginReturnedDto userLoginReturnedDto = new UserLoginReturnedDto(loggedUser.getUsername(),
+                loggedUser.getId().getId(), loggedUser.getRole().toString(), ownedTask);
+
+        return Optional.of(userLoginReturnedDto);
+    }
+
+    @Override
+    public User changeRole(String username, String role) {
+        User user = this.userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
+
+        Role newRole = Role.valueOf(role);
+
+        user.changeRole(newRole);
+
+        this.userRepository.saveAndFlush(user);
+
+        return user;
+    }
+
+    @Override
     public MyUserTasksDto findTasksForTheUser(String username, List<Task> tasks) {
         List<Task> myToDoTasks;
         List<Task> myInProgressTasks;
@@ -390,13 +467,16 @@ public class UserServiceImpl implements UserService {
 
         User user = this.userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 
-        for(Task task : tasks){
+        if(user.getTaskOwned() != null) {
 
-            String taskId = task.getId().getId();
-            String taskOwned = user.getTaskOwned().getId();
+            for (Task task : tasks) {
 
-            if(taskId.equals(taskOwned)){
-                ownedTasks.add(task);
+                String taskId = task.getId().getId();
+                String taskOwned = user.getTaskOwned().getId();
+
+                if (taskId.equals(taskOwned)) {
+                    ownedTasks.add(task);
+                }
             }
         }
 
@@ -408,8 +488,11 @@ public class UserServiceImpl implements UserService {
 
         List<Integer> numberOfTasks = this.findNumberOfTasks(username, tasks);
 
+        UserLoginReturnedDto activeUser = this.getLoggedUser().get();
+
         MyUserTasksDto myUserTasksDto = new MyUserTasksDto(myToDoTasks, myInProgressTasks,
-                myDoneTasks, myCanceledTasks, ownedTasks, numberOfTasks);
+                myDoneTasks, myCanceledTasks, ownedTasks, numberOfTasks, activeUser.getUsername(),
+                activeUser.getRole());
 
         return myUserTasksDto;
     }
@@ -423,15 +506,17 @@ public class UserServiceImpl implements UserService {
 
         List<Task> allTasks = new ArrayList<>();
 
-        for(Task task : tasks){
-            String taskId = task.getId().getId();
-            String taskAssignedId = user.getTaskAssigned().getId();
+        if(user.getTaskAssigned() != null) {
+            for (Task task : tasks) {
+                String taskId = task.getId().getId();
+                String taskAssignedId = user.getTaskAssigned().getId();
 
-            if(taskId.equals(taskAssignedId)){
-                allTasks.add(task);
+                if (taskId.equals(taskAssignedId)) {
+                    allTasks.add(task);
+                }
             }
-        }
 
+        }
         //TaskId assignedTask = user.getTaskAssigned();
 
         //allTasks.add(assignedTask);
@@ -472,12 +557,15 @@ public class UserServiceImpl implements UserService {
 
         //tasksByUser.add(taskAssigned);
 
-        for(Task task : tasks){
-            String taskId = task.getId().getId();
-            String taskAssignedId = user.getTaskAssigned().getId();
+        if(user.getTaskAssigned() != null) {
 
-            if(taskId.equals(taskAssignedId)){
-                tasksByUser.add(task);
+            for (Task task : tasks) {
+                String taskId = task.getId().getId();
+                String taskAssignedId = user.getTaskAssigned().getId();
+
+                if (taskId.equals(taskAssignedId)) {
+                    tasksByUser.add(task);
+                }
             }
         }
 

@@ -45,4 +45,7 @@ public class Comment extends AbstractEntity<CommentId> {
         this.comment = comment;
     }
 
+    public void editUser(UserId userId){
+        this.userId = userId;
+    }
 }
