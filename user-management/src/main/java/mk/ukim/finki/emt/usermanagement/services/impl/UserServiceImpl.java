@@ -517,6 +517,18 @@ public class UserServiceImpl implements UserService {
             }
 
         }
+
+        if(user.getTaskOwned() != null) {
+            for (Task task : tasks) {
+                String taskId = task.getId().getId();
+                String taskOwnedId = user.getTaskOwned().getId();
+
+                if (taskId.equals(taskOwnedId)) {
+                    allTasks.add(task);
+                }
+            }
+
+        }
         //TaskId assignedTask = user.getTaskAssigned();
 
         //allTasks.add(assignedTask);
